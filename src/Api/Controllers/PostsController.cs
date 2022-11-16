@@ -1,4 +1,4 @@
-using Application.Posts.Queries;
+using Application.Posts.Queries.GetAllPosts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -7,13 +7,13 @@ namespace Api.Controllers;
 [Route("[controller]")]
 public class PostsController : ControllerBase
 {
-    private readonly IGetPostsListQuery _query;
+    private readonly IGetAllPostsQuery _getAllQuery;
 
-    public PostsController(IGetPostsListQuery query) => _query = query;
+    public PostsController(IGetAllPostsQuery getAllQuery) => _getAllQuery = getAllQuery;
 
     [HttpGet]
-    public async Task<IEnumerable<PostsListDto>> Get()
+    public async Task<IEnumerable<PostListDto>> GetAll()
     {
-        return await _query.Execute();
+        return await _getAllQuery.Execute();
     }
 }

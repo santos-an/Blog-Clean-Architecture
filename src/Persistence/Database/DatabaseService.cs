@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Domain;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Comments;
 using Persistence.Posts;
@@ -10,6 +11,8 @@ public class DatabaseService : DbContext, IDatabaseService
 {
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Post> Posts { get; set; }
+    
+    public async Task CommitAsync() => await SaveChangesAsync();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

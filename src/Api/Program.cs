@@ -1,8 +1,17 @@
 using System.Text.Json.Serialization;
+using Api.Utils;
+using Application.Comments.Commands.CreateComment;
+using Application.Comments.Commands.DeleteComment;
+using Application.Comments.Commands.UpdateComment;
+using Application.Comments.Queries.GetAllComments;
+using Application.Comments.Queries.GetByPostId;
+using Application.Comments.Queries.GetSingleComment;
 using Application.Interfaces;
-using Application.Posts.Queries;
+using Application.Posts.Queries.GetAllPosts;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
+
+namespace Api;
 
 public static class Program
 {
@@ -28,13 +37,20 @@ public static class Program
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
     }
 
     private static void ConfigureDi(IServiceCollection services)
     {
         services.AddSingleton<IDatabaseService, DatabaseService>();
-        services.AddTransient<IGetPostsListQuery, GetPostsListQuery>();
+        
+        services.AddTransient<IGetAllPostsQuery, GetAllPostsQuery>();
+        services.AddTransient<IGetAllCommentsQuery, GetAllCommentsQuery>();
+        services.AddTransient<IGetSingleCommentQuery, GetSingleSingleCommentQuery>();
+        services.AddTransient<ICreateCommentCommand, CreateCommentCommand>();
+        services.AddTransient<IUpdateCommentCommand, UpdateCommentCommand>();
+        services.AddTransient<IDeleteCommentCommand, DeleteCommentCommand>();
+        services.AddTransient<IGetCommentByPostIdQuery, GetCommentByPostIdQuery>();
     }
 
     private static void RunMigrations(WebApplication app)
@@ -54,6 +70,7 @@ public static class Program
             app.UseSwaggerUI();
         }
 
+        app.UseMiddleware<ExceptionMiddleware>();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();

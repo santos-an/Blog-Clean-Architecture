@@ -1,19 +1,19 @@
 ﻿using Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Posts.Queries;
+namespace Application.Posts.Queries.GetAllPosts;
 
-public class GetPostsListQuery : IGetPostsListQuery
+public class GetAllPostsQuery : IGetAllPostsQuery
 {
     private readonly IDatabaseService _database;
 
-    public GetPostsListQuery(IDatabaseService database) => _database = database;
+    public GetAllPostsQuery(IDatabaseService database) => _database = database;
 
-    public async Task<List<PostsListDto>> Execute()
+    public async Task<List<PostListDto>> Execute()
     {
         var posts = _database.Posts
             .Include(p => p.Comments)
-            .Select(p => new PostsListDto()
+            .Select(p => new PostListDto()
             {
                 Id = p.Id,
                 Content = p.Content,
