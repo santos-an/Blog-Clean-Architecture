@@ -1,19 +1,13 @@
-using Application.Posts.Queries;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class PostsController : ControllerBase
+public class CommentsController : ControllerBase
 {
-    private readonly IGetPostsListQuery _query;
-
-    public PostsController(IGetPostsListQuery query) => _query = query;
-
-    [HttpGet]
-    public async Task<IEnumerable<PostsListDto>> Get()
+    public CommentsController()
     {
-        return await _query.Execute();
+        
     }
 }
