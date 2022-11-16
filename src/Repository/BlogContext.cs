@@ -1,5 +1,5 @@
+using Domain;
 using Microsoft.EntityFrameworkCore;
-using Model;
 
 namespace Repository;
 
