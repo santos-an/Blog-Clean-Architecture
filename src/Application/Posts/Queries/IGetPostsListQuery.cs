@@ -1,6 +1,6 @@
 ﻿namespace Application.Posts.Queries;
 
-public class IGetPostsListQuery
+public interface IGetPostsListQuery
 {
-    
+    Task<List<PostsListDto>> Execute();
 }
