@@ -5,19 +5,12 @@ namespace Application.Comments.Queries.GetAllComments;
 
 public class GetAllCommentsQuery : IGetAllCommentsQuery
 {
-    private readonly IDatabaseService _service;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public GetAllCommentsQuery(IDatabaseService service) => _service = service;
+    public GetAllCommentsQuery(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
     
-    public Task<List<CommentListDto>> Execute()
+    public async Task<IEnumerable<CommentListDto>> Execute()
     {
-        return _service.Comments.Select(c => new CommentListDto()
-        {
-            Id = c.Id,
-            PostId = c.PostId,
-            Author = c.Author,
-            Content = c.Content,
-            CreationDate = c.CreationDate
-        }).ToListAsync();
+        return await _unitOfWork.Comments.GetAll();
     }
 }

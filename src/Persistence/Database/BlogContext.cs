@@ -1,18 +1,18 @@
-﻿using Application.Interfaces;
-using Domain;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Persistence.Comments;
 using Persistence.Posts;
 
 namespace Persistence.Database;
 
-public class DatabaseService : DbContext, IDatabaseService
+public class BlogContext : DbContext
 {
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Post> Posts { get; set; }
     
-    public async Task CommitAsync() => await SaveChangesAsync();
+    private readonly IConfiguration _configuration;
+    public BlogContext(IConfiguration configuration) => _configuration = configuration;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -32,7 +32,7 @@ public static class Program
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        services.AddDbContext<DatabaseService>();
+        services.AddDbContext<BlogContext>();
         
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -42,7 +42,9 @@ public static class Program
 
     private static void ConfigureDi(IServiceCollection services)
     {
-        services.AddSingleton<IDatabaseService, DatabaseService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ICommentRepository, CommentRepository>();
+        services.AddScoped<IPostRepository, PostRepository>();
         
         services.AddTransient<IGetAllPostsQuery, GetAllPostsQuery>();
         services.AddTransient<IGetAllCommentsQuery, GetAllCommentsQuery>();
@@ -56,7 +58,7 @@ public static class Program
     private static void RunMigrations(WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<DatabaseService>();
+        var context = scope.ServiceProvider.GetRequiredService<BlogContext>();
 
         context.Database.Migrate();
     }

@@ -2,5 +2,5 @@
 
 public interface IGetAllCommentsQuery
 {
-    Task<List<CommentListDto>> Execute();
+    Task<IEnumerable<CommentListDto>> Execute();
 }

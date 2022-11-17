@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Interfaces;
 
-public interface IDatabaseService
+public interface IUnitOfWork
 {
-    public DbSet<Comment> Comments { get; set; }
-    public DbSet<Post> Posts { get; set; }
+    public ICommentRepository Comments { get; }
+    public IPostRepository Posts { get; } 
 
     public Task CommitAsync();
 }

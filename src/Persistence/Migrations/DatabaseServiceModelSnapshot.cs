@@ -10,7 +10,7 @@ using Persistence.Database;
 
 namespace Persistence.Migrations
 {
-    [DbContext(typeof(DatabaseService))]
+    [DbContext(typeof(UnitOfWork))]
     partial class DatabaseServiceModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

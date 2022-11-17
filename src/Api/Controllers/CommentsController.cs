@@ -35,40 +35,40 @@ public class CommentsController : ControllerBase
         _deleteCommentCommand = deleteCommentCommand;
         _commentByPostIdQuery = commentByPostIdQuery;
     }
-
+    
     [HttpGet]
     public async Task<IEnumerable<CommentListDto>> GetAll() => await _getAllCommentsQuery.Execute();
-
+    
     [HttpGet]
     [Route("{id}")]
     public async Task<CommentDto> Get(Guid id) => await _getSingleCommentQuery.Execute(id);
-
+    
     [HttpGet]
     [Route("GetByPostId/{id}")]
     public async Task<IEnumerable<CommentListDto>> GetByPostId(Guid id) => await _commentByPostIdQuery.Execute(id);
-
+    
     [HttpPost]
     public async Task<HttpResponseMessage> Create(CreateCommentDto dto)
     {
         await _createCommentCommand.Execute(dto);
-
+    
         return new HttpResponseMessage(HttpStatusCode.Created);
     }
-
+    
     [HttpPut]
     public async Task<HttpResponseMessage> Update(UpdateCommentDto dto)
     {
         await _updateCommentCommand.Execute(dto);
-
+    
         return new HttpResponseMessage(HttpStatusCode.OK);
     }
-
+    
     [HttpDelete]
     [Route("{id}")]
     public async Task<HttpResponseMessage> Delete(Guid id)
     {
         await _deleteCommentCommand.Execute(id);
-
+    
         return new HttpResponseMessage(HttpStatusCode.OK);
     }
 }
