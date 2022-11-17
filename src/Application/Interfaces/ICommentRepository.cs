@@ -10,7 +10,6 @@ public interface ICommentRepository
 {
     public Task<IEnumerable<CommentListDto>> GetAll();
     public Task<CommentDto> Get(Guid id);
-    public Task<IEnumerable<CommentDto>> GetByPostId(Guid id);
     public Task Create(CreateCommentDto dto);
     public Task<CommentDto> Update(UpdateCommentDto dto);
     public Task<bool> Delete(Guid id);

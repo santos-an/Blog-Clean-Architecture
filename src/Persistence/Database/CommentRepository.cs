@@ -88,23 +88,4 @@ public class CommentRepository : ICommentRepository
         _context.Comments.Remove(comment);
         return true;
     }
-
-    public async Task<IEnumerable<CommentDto>> GetByPostId(Guid id)
-    {
-        var post = await _context.Posts
-            .Include(p => p.Comments)
-            .FirstOrDefaultAsync(p => p.Id == id);
-        
-        if (post == null)
-            throw new EntityNotFoundException($"There is no post with id:{id} found on the database");
-        
-        return post.Comments.Select(c => new CommentDto()
-        {
-            Id = c.Id,
-            Author = c.Author,
-            Content = c.Content,
-            PostId = c.PostId,
-            CreationDate = c.CreationDate
-        }).ToList();
-    }
 }

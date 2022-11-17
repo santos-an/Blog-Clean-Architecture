@@ -1,7 +1,12 @@
 using Application.Interfaces;
+using Application.Posts.Commands.CreatePost;
+using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
+using Application.Posts.Queries.GetComments;
 using Domain.Entities;
+using Domain.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using CommentDto = Application.Posts.Queries.GetAllPosts.CommentDto;
 
 namespace Persistence.Database;
 
@@ -11,17 +16,17 @@ public class PostRepository : IPostRepository
 
     public PostRepository(BlogContext context) => _context = context;
 
-    public async Task<IEnumerable<PostListDto>> GetAll()
+    public async Task<IEnumerable<PostDto>> GetAll()
     {
         var posts = _context.Posts
             .Include(p => p.Comments)
-            .Select(p => new PostListDto()
+            .Select(post => new PostDto()
             {
-                Id = p.Id,
-                Content = p.Content,
-                Title = p.Title,
-                CreationDate = p.CreationDate,
-                Comments = p.Comments.Select(c => new CommentDto()
+                Id = post.Id,
+                Content = post.Content,
+                Title = post.Title,
+                CreationDate = post.CreationDate,
+                Comments = post.Comments.Select(c => new CommentDto()
                 {
                     Id = c.Id,
                     Author = c.Author,
@@ -33,23 +38,105 @@ public class PostRepository : IPostRepository
         return await posts.ToListAsync();
     }
 
-    public Post Get(Guid id)
+    public async Task<PostDto> Get(Guid id)
     {
-        throw new NotImplementedException();
+        var post = await _context.Posts
+            .Include(p => p.Comments)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (post == null)
+            throw new EntityNotFoundException($"There is no post with id:{id} found on the database");
+        
+        return new PostDto()
+        {
+            Id = post.Id,
+            Comments = post.Comments.Select(comment => new CommentDto()
+            {
+                Author = comment.Author,
+                Content = comment.Content,
+                Id = comment.Id,
+                CreationDate = comment.CreationDate
+            }).ToList(),
+            Content = post.Content,
+            Title = post.Title,
+            CreationDate = post.CreationDate
+        };
     }
 
-    public Post Create(Post post)
+    public async Task<PostWithCommentsDto> GetComments(Guid id)
     {
-        throw new NotImplementedException();
+        var post = await _context.Posts
+            .Include(p => p.Comments)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (post == null)
+            throw new EntityNotFoundException($"There is no post with id:{id} found on the database");
+
+        return new PostWithCommentsDto()
+        {
+            PostId = post.Id,
+            Comments = post.Comments.Select(c => new CommentListDto()
+            {
+                Id = c.Id,
+                Author = c.Author,
+                Content = c.Content,
+                CreationDate = c.CreationDate
+            }).ToList()
+        };
     }
 
-    public Post Update(Post post)
+    public async Task Create(CreatePostDto dto)
     {
-        throw new NotImplementedException();
+        var post = new Post()
+        {
+            Title = dto.Title,
+            Content = dto.Content,
+            CreationDate = DateTime.Now,
+            Comments = dto.Comments.Select(comment => new Comment()
+            {
+                Content = comment.Content,
+                Author = comment.Author,
+                CreationDate = DateTime.Now
+            }).ToList()
+        };
+
+        await _context.Posts.AddAsync(post);
     }
 
-    public bool Delete(Guid id)
+    public async Task<PostDto> Update(UpdatePostDto dto)
     {
-        throw new NotImplementedException();
+        var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == dto.Id);
+        if (post == null)
+            throw new EntityNotFoundException($"There is no post with the given id:{dto.Id}");
+
+        if (!string.IsNullOrEmpty(dto.Content))
+            post.Content = dto.Content;
+        if (!string.IsNullOrEmpty(dto.Title))
+            post.Title = dto.Title;
+
+        return new PostDto()
+        {
+            Id = post.Id,
+            Content = post.Content,
+            Title = post.Title,
+            CreationDate = post.CreationDate,
+            Comments = post.Comments.Select(comment => new CommentDto()
+            {
+                Id = comment.Id,
+                Author = comment.Author,
+                Content = comment.Content,
+                CreationDate = comment.CreationDate
+            }).ToList()
+        };
+    }
+
+    public async Task<bool> Delete(Guid id)
+    {
+        var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == id);
+        if (post == null)
+            throw new EntityNotFoundException($"There is no post with the given id:{id}");
+
+        _context.Posts.Remove(post);
+        return true;
     }
 }

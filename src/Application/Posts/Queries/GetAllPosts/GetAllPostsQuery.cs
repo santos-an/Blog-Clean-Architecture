@@ -8,5 +8,5 @@ public class GetAllPostsQuery : IGetAllPostsQuery
 
     public GetAllPostsQuery(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-    public async Task<IEnumerable<PostListDto>> Execute() => await _unitOfWork.Posts.GetAll();
+    public async Task<IEnumerable<PostDto>> Execute() => await _unitOfWork.Posts.GetAll();
 }

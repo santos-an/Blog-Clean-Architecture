@@ -7,7 +7,12 @@ using Application.Comments.Queries.GetAllComments;
 using Application.Comments.Queries.GetByPostId;
 using Application.Comments.Queries.GetSingleComment;
 using Application.Interfaces;
+using Application.Posts.Commands.CreatePost;
+using Application.Posts.Commands.DeletePost;
+using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
+using Application.Posts.Queries.GetComments;
+using Application.Posts.Queries.GetSinglePost;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
 
@@ -46,13 +51,19 @@ public static class Program
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IPostRepository, PostRepository>();
         
-        services.AddTransient<IGetAllPostsQuery, GetAllPostsQuery>();
         services.AddTransient<IGetAllCommentsQuery, GetAllCommentsQuery>();
         services.AddTransient<IGetSingleCommentQuery, GetSingleSingleCommentQuery>();
         services.AddTransient<ICreateCommentCommand, CreateCommentCommand>();
         services.AddTransient<IUpdateCommentCommand, UpdateCommentCommand>();
         services.AddTransient<IDeleteCommentCommand, DeleteCommentCommand>();
         services.AddTransient<IGetCommentByPostIdQuery, GetCommentByPostIdQuery>();
+        
+        services.AddTransient<IGetAllPostsQuery, GetAllPostsQuery>();
+        services.AddTransient<IGetSinglePostQuery, GetSinglePostQuery>();
+        services.AddTransient<IGetCommentsQuery, GetCommentsQuery>();
+        services.AddTransient<ICreatePostCommand, CreatePostCommand>();
+        services.AddTransient<IUpdatePostCommand, UpdatePostCommand>();
+        services.AddTransient<IDeletePostCommand, DeletePostCommand>();
     }
 
     private static void RunMigrations(WebApplication app)
@@ -65,7 +76,6 @@ public static class Program
 
     private static void ConfigureApp(WebApplication app)
     {
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();

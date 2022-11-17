@@ -1,6 +1,6 @@
 ﻿namespace Application.Posts.Queries.GetAllPosts;
 
-public record PostListDto
+public record PostDto
 {
     public Guid Id { get; set; }
     public string Title { get; set; }

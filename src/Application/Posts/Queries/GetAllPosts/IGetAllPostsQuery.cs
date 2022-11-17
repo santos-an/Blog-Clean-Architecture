@@ -2,5 +2,5 @@
 
 public interface IGetAllPostsQuery
 {
-    Task<IEnumerable<PostListDto>> Execute();
+    Task<IEnumerable<PostDto>> Execute();
 }
