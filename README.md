@@ -1,3 +1,6 @@
+![build](https://github.com/santos-an/devskiller-code-WT97-TAH7-TY6E-S0F/actions/workflows/build.yml/badge.svg)
+![test](https://github.com/santos-an/devskiller-code-WT97-TAH7-TY6E-S0F/actions/workflows/test.yml/badge.svg)
+
 ## Introduction
 You were hired as a consultant for BestBlogs<sup>TM</sup> company. The company 
 needs your help with finishing the implementation of a REST api for its newest blog product.
