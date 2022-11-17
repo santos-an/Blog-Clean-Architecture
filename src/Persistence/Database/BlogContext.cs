@@ -10,9 +10,6 @@ public class BlogContext : DbContext
 {
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Post> Posts { get; set; }
-    
-    private readonly IConfiguration _configuration;
-    public BlogContext(IConfiguration configuration) => _configuration = configuration;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

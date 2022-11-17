@@ -11,7 +11,7 @@ using Persistence.Database;
 
 namespace Persistence.Migrations
 {
-    [DbContext(typeof(UnitOfWork))]
+    [DbContext(typeof(BlogContext))]
     [Migration("20221116143457_v4")]
     partial class v4
     {
