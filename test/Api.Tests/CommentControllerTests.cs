@@ -84,16 +84,18 @@ public class CommentControllerTests
     {
         // arrange
         _getSingleCommentQuery.Setup(c => c.Execute(It.IsAny<Guid>())).Throws<EntityNotFoundException>();
-        
-        // Act
+
+        CommentDto actual = null;
         try
         {
-            var actual = await _controller.Get(Guid.NewGuid());
+            // Act
+            actual = await _controller.Get(Guid.NewGuid());
         }
         catch (EntityNotFoundException e)
         {
             // assert
             _getSingleCommentQuery.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
+            actual.Should().BeNull();
         }
     }
 
