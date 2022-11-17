@@ -75,4 +75,8 @@ If you feel like this is to easy, we have some extra challenges you might want t
 ## Uploading
 If you struggle at any time when uploading your solution, you can upload to a private GitHub repository and we will review it.
 
+## Docker (on windows containers)
+- `docker build -t blog -f Dockerfile .`
+- `docker run -it --name blog -p 8081:80 -d blog`
+
 ## Good luck!
