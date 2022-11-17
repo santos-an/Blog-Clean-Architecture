@@ -9,7 +9,6 @@ public class UpdatePostCommand : IUpdatePostCommand
 
     public UpdatePostCommand(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-
     public async Task<PostDto> Execute(UpdatePostDto dto)
     {
         var result = await _unitOfWork.Posts.Update(dto);

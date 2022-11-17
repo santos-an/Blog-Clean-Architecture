@@ -15,7 +15,7 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Api.Tests;
+namespace Api.Tests.Controllers;
 
 public class CommentControllerTests
 {
