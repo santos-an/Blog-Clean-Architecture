@@ -1,6 +1,8 @@
 ﻿using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetSingleComment;
 using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
 using Domain.Exceptions;
 using FluentAssertions;
 using Moq;
@@ -23,66 +25,34 @@ public class UpdateCommentCommandTests
     public async Task Execute_FindsComment_UpdatesComment()
     {
         // arrange
-        var commentId = Guid.NewGuid();
-        const string newAuthor = "updated author for a comment";
-        const string newContent = "updated content for a given comment";
-        
-        var input = new UpdateCommentDto()
-        {
-            Id = commentId,
-            NewAuthor = newAuthor,
-            NewContent = newContent
-        };
-        var expected = new CommentDto()
-        {
-            Id = commentId,
-            Author = newAuthor,
-            Content = newContent,
-            PostId = Guid.NewGuid(),
-            CreationDate = DateTime.Today
-        };
-        
-        _unitOfWork.Setup(u => u.Comments.Update(It.IsAny<UpdateCommentDto>())).ReturnsAsync(expected);
-        _unitOfWork.Setup(u => u.CommitAsync());
+        _unitOfWork.Setup(u => u.Comments.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Comment>(new Comment()));
+        _unitOfWork.Setup(u => u.Comments.Update(It.IsAny<Comment>(), It.IsAny<UpdateCommentDto>())).Returns(new Comment());
         
         // act
-        await _command.Execute(input);
+        var actual = await _command.Execute(new UpdateCommentDto());
 
         // assert
-        _unitOfWork.Verify(u => u.Comments.Update(It.IsAny<UpdateCommentDto>()), Times.Once);
+        _unitOfWork.Verify(u => u.Comments.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Comments.Update(It.IsAny<Comment>(), It.IsAny<UpdateCommentDto>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
-        
-        expected.Id.Should().Be(input.Id);
-        expected.Author.Should().Be(input.NewAuthor);
-        expected.Content.Should().Be(input.NewContent);
+
+        actual.IsSuccess.Should().Be(true);
     }
 
     [Fact]
-    public async Task Execute_DoesNotFindComment_ThrowsException()
+    public async Task Execute_DoesNotFindComment_ReturnsFail()
     {
         // arrange
-        var commentId = Guid.NewGuid();
-        const string newAuthor = "updated author for a comment";
-        const string newContent = "updated content for a given comment";
+        _unitOfWork.Setup(u => u.Comments.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Comment>());
         
-        var input = new UpdateCommentDto()
-        {
-            Id = commentId,
-            NewAuthor = newAuthor,
-            NewContent = newContent
-        };
+        // act
+        var actual = await _command.Execute(new UpdateCommentDto());
+        
+        // assert
+        _unitOfWork.Verify(u => u.Comments.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Comments.Update(It.IsAny<Comment>(), It.IsAny<UpdateCommentDto>()), Times.Never);
+        _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
 
-        _unitOfWork.Setup(u => u.Comments.Update(It.IsAny<UpdateCommentDto>())).Throws<EntityNotFoundException>();
-
-        try
-        {
-            // act
-            await _command.Execute(input);
-        }
-        catch (EntityNotFoundException)
-        {
-            _unitOfWork.Verify(u => u.Comments.Update(It.IsAny<UpdateCommentDto>()), Times.Once);
-            _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
-        }
+        actual.IsFailure.Should().Be(true);
     }
 }

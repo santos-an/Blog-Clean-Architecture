@@ -1,6 +1,9 @@
 ﻿using Application.Interfaces;
 using Application.Posts.Commands.DeletePost;
+using Domain.Common;
+using Domain.Entities;
 using Domain.Exceptions;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -21,32 +24,34 @@ public class DeletePostCommandTests
     public async Task Execute_FindsPost_DeletesPost()
     {
         // arrange
-        _unitOfWork.Setup(u => u.Posts.Delete(It.IsAny<Guid>()));
+        _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>(new Post()));
+        _unitOfWork.Setup(u => u.Posts.Delete(It.IsAny<Post>())).ReturnsAsync(true);
 
         // act
-        await _command.Execute(Guid.NewGuid());
+        var actual = await _command.Execute(Guid.NewGuid());
 
         // assert
-        _unitOfWork.Verify(u => u.Posts.Delete(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Delete(It.IsAny<Post>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        
+        actual.IsSuccess.Should().Be(true);
     }
 
     [Fact]
-    public async Task Execute_DoesNotFindPost_ThrowsException()
+    public async Task Execute_DoesNotFindPost_ReturnsFail()
     {
         // arrange
-        _unitOfWork.Setup(u => u.Posts.Delete(It.IsAny<Guid>())).Throws<EntityNotFoundException>();
+        _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>());
+    
+        // act
+        var actual = await _command.Execute(Guid.NewGuid());
 
-        try
-        {
-            // act
-            await _command.Execute(Guid.NewGuid());
-        }
-        catch (EntityNotFoundException)
-        {
-            // assert
-            _unitOfWork.Verify(u => u.Posts.Delete(It.IsAny<Guid>()), Times.Once);
-            _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
-        }
+        // assert
+        _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Delete(It.IsAny<Post>()), Times.Never);
+        _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
+        
+        actual.IsFailure.Should().Be(true);
     }
 }

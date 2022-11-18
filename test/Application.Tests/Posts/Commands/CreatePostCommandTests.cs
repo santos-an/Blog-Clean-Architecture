@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Posts.Commands.CreatePost;
+using Domain.Entities;
 using Moq;
 using Xunit;
 
@@ -20,26 +21,14 @@ public class CreatePostCommandTests
     public async Task Execute_GetsCalled_CreatesNewPostAndCommitsChanges()
     {
         // arrange
-        var input = new CreatePostDto()
-        {
-            Title = "CR7 interview",
-            Content = "Ten Haag is bald",
-            Comments = new List<CreateCommentDto>()
-            {
-                new()
-                {
-                    Author = "from cristiano ronaldo",
-                    Content = "Man United sucks"
-                }
-            }
-        };
-        _unitOfWork.Setup(u => u.Posts.Create(It.IsAny<CreatePostDto>()));
+        var input = new CreatePostDto { Comments = new List<CreateCommentDto>() };
+        _unitOfWork.Setup(u => u.Posts.Create(It.IsAny<Post>()));
 
         // act
         await _command.Execute(input);
 
         // assert
-        _unitOfWork.Verify(u => u.Posts.Create(It.IsAny<CreatePostDto>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Create(It.IsAny<Post>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
     }
 }

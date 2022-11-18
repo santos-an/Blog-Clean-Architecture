@@ -1,5 +1,6 @@
 ﻿using Application.Comments.Queries.GetAllComments;
 using Application.Interfaces;
+using Domain.Entities;
 using FluentAssertions;
 using Moq;
 using Xunit;
@@ -21,7 +22,7 @@ public class GetAllCommentsQueryTests
     public async Task Execute_GetsCalled_ReturnsAllExistingComments()
     {
         // arrange
-        _unitOfWork.Setup(u => u.Comments.GetAll()).ReturnsAsync(GetComments());
+        _unitOfWork.Setup(u => u.Comments.GetAll()).ReturnsAsync(Comments());
 
         // act
         var actual = await _commentsQuery.Execute();
@@ -33,23 +34,15 @@ public class GetAllCommentsQueryTests
         actual.Should().NotBeEmpty();
     }
 
-    private IEnumerable<CommentListDto> GetComments()
+    private IEnumerable<Comment> Comments()
     {
-        return new List<CommentListDto>()
+        return new List<Comment>()
         {
             new()
             {
                 Id = Guid.NewGuid(),
                 Author = "author 1",
                 Content = "content 1",
-                PostId = Guid.NewGuid(),
-                CreationDate = DateTime.Now,
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Author = "author 2",
-                Content = "content 2",
                 PostId = Guid.NewGuid(),
                 CreationDate = DateTime.Now,
             }

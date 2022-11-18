@@ -1,5 +1,8 @@
 ﻿using Application.Comments.Commands.CreateComment;
 using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -17,23 +20,36 @@ public class CreateCommentCommandTests
     }
 
     [Fact]
-    public async Task Execute_GetsCalled_CreatesNewComment()
+    public async Task Execute_FindsPost_AddsNewComment()
     {
         // arrange
-        var input = new CreateCommentDto()
-        {
-            PostId = Guid.NewGuid(),
-            Author = "new author",
-            Content = "new comment content"
-        };
-        _unitOfWork.Setup(u => u.Comments.Create(It.IsAny<CreateCommentDto>()));
+        _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>(new Post()));
+        _unitOfWork.Setup(u => u.Comments.Create(It.IsAny<Post>(), It.IsAny<Comment>())); 
         _unitOfWork.Setup(u => u.CommitAsync());
 
         // act
-        await _command.Execute(input);
+        var actual = await _command.Execute(new CreateCommentDto());
 
         // assert
-        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<CreateCommentDto>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Post>(),It.IsAny<Comment>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        actual.IsSuccess.Should().Be(true);
+    }
+
+    [Fact]
+    public async Task Execute_DoesNotFindPost_ReturnsFail()
+    {
+        // arrange
+        _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>());
+        
+        // act
+        var actual = await _command.Execute(new CreateCommentDto());
+        
+        // assert
+        _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Post>(),It.IsAny<Comment>()), Times.Never);
+        _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
+        actual.IsFailure.Should().Be(true);
     }
 }

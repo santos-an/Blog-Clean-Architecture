@@ -27,8 +27,4 @@
       <ProjectReference Include="..\..\src\Application\Application.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Posts\Queries" />
-    </ItemGroup>
-
 </Project>

@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces;
 using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
+using Domain.Common;
+using Domain.Entities;
 using Domain.Exceptions;
 using FluentAssertions;
 using Moq;
@@ -23,68 +25,34 @@ public class UpdatePostCommandTests
     public async Task Execute_FindPost_UpdatesPost()
     {
         // arrange
-        var input = new UpdatePostDto()
-        {
-            Id = Guid.NewGuid(),
-            Content = "new content",
-            Title = "cr7"
-        };
-        var expected = new PostDto()
-        {
-            Id = Guid.NewGuid(),
-            Title = input.Title,
-            Content = input.Content,
-            CreationDate = DateTime.Today,
-            Comments = new List<CommentDto>()
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    Author = "author 1",
-                    Content = "content 1",
-                    CreationDate = DateTime.Now,
-                }
-            }
-        };
-        _unitOfWork.Setup(u => u.Posts.Update(It.IsAny<UpdatePostDto>())).ReturnsAsync(expected);
+        _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>(new Post()));
+        _unitOfWork.Setup(u => u.Posts.Update(It.IsAny<Post>(), It.IsAny<UpdatePostDto>())).Returns(new Post());
         
         // act
-        var actual = await _command.Execute(input);
+        var actual = await _command.Execute(new UpdatePostDto());
 
         // assert
-        _unitOfWork.Verify(u => u.Posts.Update(It.IsAny<UpdatePostDto>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Update(It.IsAny<Post>(), It.IsAny<UpdatePostDto>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
 
-        expected.Id.Should().Be(actual.Id);
-        expected.Title.Should().Be(actual.Title);
-        expected.Content.Should().Be(actual.Content);
+        actual.IsSuccess.Should().Be(true);
     }
 
     [Fact]
     public async Task Execute_DoesNotFindPost_ThrowsException()
     {
         // arrange
-        var input = new UpdatePostDto()
-        {
-            Id = Guid.NewGuid(),
-            Content = "new content",
-            Title = "cr7"
-        };
-        _unitOfWork.Setup(u => u.Posts.Update(It.IsAny<UpdatePostDto>())).Throws<EntityNotFoundException>();
+        _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>());
+        
+        // act
+        var actual = await _command.Execute(new UpdatePostDto());
 
-        PostDto actual = null;
-        try
-        {
-            // act
-            actual = await _command.Execute(input);
-        }
-        catch (EntityNotFoundException)
-        {
-            // assert
-            _unitOfWork.Verify(u => u.Posts.Update(It.IsAny<UpdatePostDto>()), Times.Once);
-            _unitOfWork.Verify(u => u.CommitAsync(), Times.Never());
-            
-            actual.Should().BeNull();
-        }
+        // assert
+        _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
+        _unitOfWork.Verify(u => u.Posts.Update(It.IsAny<Post>(), It.IsAny<UpdatePostDto>()), Times.Never);
+        _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
+
+        actual.IsFailure.Should().Be(true);
     }
 }
