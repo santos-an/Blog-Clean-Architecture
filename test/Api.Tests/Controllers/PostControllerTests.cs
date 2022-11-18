@@ -166,29 +166,36 @@ public class PostControllerTests
     public async Task Create_AddsNewPost_ReturnsOk()
     {
         // arrange
-        _createPostCommand.Setup(c => c.Execute(It.IsAny<CreatePostDto>()));
-        var input = new CreatePostDto()
-        {
-            Title = "new post title",
-            Content = "new post content",
-            Comments = new List<CreateCommentDto>()
-            {
-                new()
-                {
-                    Author = "new author",
-                    Content = "new comment"
-                }
-            }
-        };
+        var expected = Result.Ok(new PostDto());
+        _createPostCommand.Setup(c => c.Execute(It.IsAny<CreatePostDto>())).ReturnsAsync(expected);
 
         // act
-        var result = await _controller.Create(input);
+        var result = await _controller.Create(new CreatePostDto());
         var actual = (result as OkObjectResult).Value;
 
         // assert
         _createPostCommand.Verify(c => c.Execute(It.IsAny<CreatePostDto>()), Times.Once);
         result.Should().BeOfType<OkObjectResult>();
-        actual.Should().Be("Created");
+        expected.IsSuccess.Should().Be(true);
+        expected.Value.Should().Be(actual);
+    }
+
+    [Fact]
+    public async Task Create_FailsAddNewPost_ReturnsBadRequest()
+    {
+        // arrange
+        var expected = Result.Fail<PostDto>("error");
+        _createPostCommand.Setup(c => c.Execute(It.IsAny<CreatePostDto>())).ReturnsAsync(expected);
+
+        // act
+        var result = await _controller.Create(new CreatePostDto());
+        var actual = (result as BadRequestObjectResult).Value;
+
+        // assert
+        _createPostCommand.Verify(c => c.Execute(It.IsAny<CreatePostDto>()), Times.Once);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        expected.IsFailure.Should().Be(true);
+        expected.Error.Should().Be(actual.ToString());
     }
 
     [Fact]
