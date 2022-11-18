@@ -15,20 +15,14 @@ public class PostRepositoryTests
     private readonly IQueryable<Post> _posts;
     private readonly Mock<DbSet<Post>> _dbSetMock;
     private readonly Mock<BlogContext> _blogContextMock;
-    
-    private readonly IPostRepository _postRepository;
-    private readonly ICommentRepository _commentRepository;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IPostRepository _repository;
 
     public PostRepositoryTests()
     {
         _posts = DatabaseInitializer.Posts.AsQueryable();
         _dbSetMock = _posts.BuildMockDbSet();
         _blogContextMock = new Mock<BlogContext>();
-
-        _commentRepository = new CommentRepository(_blogContextMock.Object);
-        _postRepository = new PostRepository(_blogContextMock.Object);
-        _unitOfWork = new UnitOfWork(_blogContextMock.Object, _commentRepository, _postRepository);
+        _repository = new PostRepository(_blogContextMock.Object);
     }
 
     [Fact]
@@ -38,7 +32,7 @@ public class PostRepositoryTests
         _blogContextMock.Setup(c => c.Posts).Returns(_dbSetMock.Object);
 
         // act
-        var posts = await _postRepository.GetAll();
+        var posts = await _repository.GetAll();
 
         // assert
         posts.Count().Should().BePositive();
@@ -53,7 +47,7 @@ public class PostRepositoryTests
         var id = _posts.ElementAt(0).Id;
 
         // act
-        var actual = await _postRepository.Get(id);
+        var actual = await _repository.Get(id);
 
         // assert
         actual.HasValue.Should().Be(true);
@@ -69,7 +63,7 @@ public class PostRepositoryTests
         var id = Guid.Empty;
 
         // act
-        var actual = await _postRepository.Get(id);
+        var actual = await _repository.Get(id);
 
         // assert
         actual.HasNoValue.Should().Be(true);
@@ -84,7 +78,7 @@ public class PostRepositoryTests
         var id = _posts.ElementAt(0).Id;
         
         // act
-        var actual = await _postRepository.GetComments(id);
+        var actual = await _repository.GetComments(id);
         
         // assert
         actual.HasValue.Should().Be(true);
@@ -99,26 +93,10 @@ public class PostRepositoryTests
         var id = Guid.Empty;
         
         // act
-        var actual = await _postRepository.GetComments(id);
+        var actual = await _repository.GetComments(id);
         
         // assert
         actual.HasNoValue.Should().Be(true);
-    }
-
-    [Fact]
-    public async Task Create_AddNewPost_SizeIncreases()
-    {
-        // arrange
-        _blogContextMock.Setup(c => c.Posts).Returns(_dbSetMock.Object);
-        var size = _dbSetMock.Object.Count();
-
-        // act
-        await _postRepository.Create(new Post());
-        await _unitOfWork.CommitAsync();
-
-        // assert
-        var expectedSize = _dbSetMock.Object.Count() + 1;
-        expectedSize.Should().Be(size + 1);
     }
 
     [Fact]
@@ -131,7 +109,7 @@ public class PostRepositoryTests
         var dto = new UpdatePostDto { Title = string.Empty, Content = expectedContent };
 
         // act
-        var actual = _postRepository.Update(post, dto);
+        var actual = _repository.Update(post, dto);
 
         // assert
         actual.Should().NotBeNull();
@@ -151,7 +129,7 @@ public class PostRepositoryTests
         var dto = new UpdatePostDto { Title = expectedTitle, Content = expectedContent };
 
         // act
-        var actual = _postRepository.Update(post, dto);
+        var actual = _repository.Update(post, dto);
 
         // assert
         actual.Should().NotBeNull();
@@ -168,7 +146,7 @@ public class PostRepositoryTests
         var dto = new UpdatePostDto { Title = string.Empty, Content = string.Empty };
 
         // act
-        var actual = _postRepository.Update(post, dto);
+        var actual = _repository.Update(post, dto);
 
         // assert
         actual.Should().NotBeNull();
