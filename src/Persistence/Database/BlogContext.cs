@@ -7,8 +7,8 @@ namespace Persistence.Database;
 
 public class BlogContext : DbContext
 {
-    public DbSet<Comment> Comments { get; set; }
-    public DbSet<Post> Posts { get; set; }
+    public virtual DbSet<Comment> Comments { get; set; }
+    public virtual DbSet<Post> Posts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
