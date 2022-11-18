@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Api.Controllers;
 using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
-using Application.Comments.Queries.GetByPostId;
 using Application.Comments.Queries.GetSingleComment;
-using Domain.Exceptions;
+using Domain.Common;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
@@ -20,160 +18,199 @@ namespace Api.Tests.Controllers;
 public class CommentControllerTests
 {
     private readonly Mock<IGetAllCommentsQuery> _getAllCommentsQuery;
-    private readonly Mock<IGetSingleCommentQuery> _getSingleCommentQuery;
+    private readonly Mock<IGetCommentQuery> _getCommentQuery;
     private readonly Mock<ICreateCommentCommand> _createCommentCommand;
     private readonly Mock<IUpdateCommentCommand> _updateCommentCommand;
     private readonly Mock<IDeleteCommentCommand> _deleteCommentCommand;
-    private readonly Mock<IGetCommentByPostIdQuery> _commentByPostIdQuery;
 
     private readonly CommentsController _controller;
 
     public CommentControllerTests()
     {
         _getAllCommentsQuery = new Mock<IGetAllCommentsQuery>();
-        _getSingleCommentQuery = new Mock<IGetSingleCommentQuery>();
+        _getCommentQuery = new Mock<IGetCommentQuery>();
         _createCommentCommand = new Mock<ICreateCommentCommand>();
         _updateCommentCommand = new Mock<IUpdateCommentCommand>();
         _deleteCommentCommand = new Mock<IDeleteCommentCommand>();
-        _commentByPostIdQuery = new Mock<IGetCommentByPostIdQuery>();
 
-        _controller = new CommentsController(_getAllCommentsQuery.Object, _getSingleCommentQuery.Object, _createCommentCommand.Object, _updateCommentCommand.Object, _deleteCommentCommand.Object, _commentByPostIdQuery.Object);
+        _controller = new CommentsController(
+            _getAllCommentsQuery.Object, 
+            _getCommentQuery.Object,
+            _createCommentCommand.Object, 
+            _updateCommentCommand.Object, 
+            _deleteCommentCommand.Object);
     }
 
     [Fact]
     public async Task GetAll_Returns_ExistingComments()
     {
         // Arrange
-        var expected = new List<CommentListDto>() { new() { Author = "author 1", Content = "conten 1", PostId = Guid.NewGuid(), Id = Guid.NewGuid(), CreationDate = DateTime.Today }};
+        var expected = new List<CommentDto>()
+        {
+            new()
+            {
+                Author = "author 1", Content = "conten 1", PostId = Guid.NewGuid(), CommentId = Guid.NewGuid(),
+                CreationDate = DateTime.Today
+            }
+        };
         _getAllCommentsQuery.Setup(p => p.Execute()).ReturnsAsync(expected);
 
         // Act
-        var actual = await _controller.GetAll();
+        var result = await _controller.GetAll();
+        var actual = (result as OkObjectResult).Value;
 
         // Assert
         _getAllCommentsQuery.Verify(c => c.Execute(), Times.Once);
-        actual.Should().NotBeEmpty();
+        result.Should().BeOfType<OkObjectResult>();
         actual.Should().NotBeNull();
+        actual.Should().Be(expected);
     }
 
     [Fact]
     public async Task Get_FindsComment_ReturnsExistingComment()
     {
         // Arrange
-        var expected = new CommentDto()
+        var expected = Result.Ok(new CommentDto()
         {
-            Id = Guid.NewGuid(),
+            CommentId = Guid.NewGuid(),
             Author = "author 1",
             Content = "content 1",
             PostId = Guid.NewGuid(),
             CreationDate = DateTime.Today,
-        };
-        _getSingleCommentQuery.Setup(c => c.Execute(It.IsAny<Guid>())).ReturnsAsync(expected);
+        });
+        _getCommentQuery.Setup(c => c.Execute(It.IsAny<Guid>())).ReturnsAsync(expected);
 
         // Act
-        var actual = await _controller.Get(Guid.NewGuid());
-        
+        var result = await _controller.Get(Guid.NewGuid());
+        var actual = (result as OkObjectResult).Value;
+
         // assert
-        _getSingleCommentQuery.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
+        _getCommentQuery.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
+        result.Should().BeOfType<OkObjectResult>();
         actual.Should().NotBeNull();
-        expected.Should().Be(actual);
+        expected.Value.Should().Be(actual);
     }
-    
+
     [Fact]
-    public async Task Get_DoesNotFindComment_ThrowsException()
+    public async Task Get_DoesNotFindComment_ThrowsBadRequest()
     {
         // arrange
-        _getSingleCommentQuery.Setup(c => c.Execute(It.IsAny<Guid>())).Throws<EntityNotFoundException>();
+        var expected = Result.Fail<CommentDto>($"There is no comment for the given id:{Guid.NewGuid()}");
+        _getCommentQuery.Setup(c => c.Execute(It.IsAny<Guid>())).ReturnsAsync(expected);
 
-        CommentDto actual = null;
-        try
-        {
-            // Act
-            actual = await _controller.Get(Guid.NewGuid());
-        }
-        catch (EntityNotFoundException e)
-        {
-            // assert
-            _getSingleCommentQuery.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
-            actual.Should().BeNull();
-        }
+        // act
+        var result = await _controller.Get(Guid.NewGuid());
+        var actual = (result as BadRequestResult);
+
+        // assert
+        _getCommentQuery.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        actual.Should().BeNull();
     }
 
     [Fact]
     public async Task Create_AddsNewComment_ReturnsOK()
     {
         // arrange
-        _createCommentCommand.Setup(C => C.Execute(It.IsAny<CreateCommentDto>()));
-        var input = new CreateCommentDto()
-        {
-            PostId = Guid.NewGuid(),
-            Author = "author 1",
-            Content = "content 1",
-        };
-        
+        var input = new CreateCommentDto { PostId = Guid.NewGuid(), Author = "author 1", Content = "content 1", };
+        var expected = Result.Ok(new CommentDto { CommentId = Guid.NewGuid(), PostId = input.PostId, Author = input.Author, Content = input.Content });
+        _createCommentCommand.Setup(c => c.Execute(It.IsAny<CreateCommentDto>())).ReturnsAsync(expected);
+
         // act
-        var actual = await _controller.Create(input);
-        
+        var result = await _controller.Create(input);
+        var actual = (result as OkObjectResult).Value as CommentDto;
+
         // assert
         _createCommentCommand.Verify(c => c.Execute(It.IsAny<CreateCommentDto>()), Times.Once);
         
-        actual.Should().BeOfType<HttpResponseMessage>();
-        actual.StatusCode.Should().Be(HttpStatusCode.Created);
+        result.Should().BeOfType<OkObjectResult>();
+        actual.Should().NotBeNull();
+        expected.Value.PostId.Should().Be(actual.PostId);
+        expected.Value.Author.Should().Be(actual.Author);
+        expected.Value.Content.Should().Be(actual.Content);
     }
 
     [Fact]
-    public async Task Update_UpdatesComment_ReturnsOK()
+    public async Task Update_FindsComment_ReturnsOK()
     {
         // arrange
-        _updateCommentCommand.Setup(c => c.Execute(It.IsAny<UpdateCommentDto>()));
         var input = new UpdateCommentDto()
         {
             Id = Guid.NewGuid(),
             NewAuthor = "new author",
             NewContent = "new content"
         };
-        
+        var expected = Result.Ok(new CommentDto()
+        {
+            CommentId = input.Id,
+            Author = input.NewAuthor,
+            Content = input.NewContent
+        });
+        _updateCommentCommand.Setup(c => c.Execute(It.IsAny<UpdateCommentDto>())).ReturnsAsync(expected);
+
         // act
-        var actual = await _controller.Update(input);
+        var result = await _controller.Update(input);
+        var actual = (result as OkObjectResult).Value as CommentDto;
         
         // assert
         _updateCommentCommand.Verify(c => c.Execute(It.IsAny<UpdateCommentDto>()), Times.Once);
-
-        actual.Should().BeOfType<HttpResponseMessage>();
-        actual.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Should().BeOfType<OkObjectResult>();
+        actual.Should().NotBeNull();
+        expected.Value.PostId.Should().Be(actual.PostId);
+        expected.Value.Author.Should().Be(actual.Author);
+        expected.Value.Content.Should().Be(actual.Content);
     }
 
+    [Fact]
+    public async Task Update_DoesNotFindsComment_ReturnsBadRequest()
+    {
+        // arrange
+        var input = new UpdateCommentDto { Id = Guid.NewGuid() };
+        var expected = Result.Fail<CommentDto>("error");
+        _updateCommentCommand.Setup(c => c.Execute(It.IsAny<UpdateCommentDto>())).ReturnsAsync(expected);
+        
+        // act
+        var result = await _controller.Update(input);
+        var actual = (result as BadRequestObjectResult).Value;
+        
+        // assert
+        _updateCommentCommand.Verify(c => c.Execute(It.IsAny<UpdateCommentDto>()), Times.Once);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        expected.Error.Should().Be(actual.ToString());
+    }
+    
     [Fact]
     public async Task Delete_FindsComment_DeletesCommentAndReturnsOK()
     {
         // arrange
-        _deleteCommentCommand.Setup(c => c.Execute(It.IsAny<Guid>()));
+        var expected = Result.Ok(true);
+        _deleteCommentCommand.Setup(c => c.Execute(It.IsAny<Guid>())).ReturnsAsync(expected);
         
         // act
-        var actual = await _controller.Delete(Guid.NewGuid());
+        var result = await _controller.Delete(Guid.NewGuid());
+        var actual = (result as OkObjectResult).Value;
         
         // assert
         _deleteCommentCommand.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
-
-        actual.Should().BeOfType<HttpResponseMessage>();
-        actual.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Should().BeOfType<OkObjectResult>();
+        expected.Value.Should().Be(true);
+        actual.Should().Be("Deleted");
     }
-
+    
     [Fact]
-    public async Task Delete_DoesNotFindComment_ThrowsException()
+    public async Task Delete_DoesNotFindComment_ThrowsBadRequest()
     {
         // arrange
-        _deleteCommentCommand.Setup(c => c.Execute(It.IsAny<Guid>())).Throws<EntityNotFoundException>();
-
-        try
-        {
-            // act
-            var actual = await _controller.Delete(Guid.NewGuid());
-        }
-        catch (EntityNotFoundException e)
-        {
-            // assert
-            _deleteCommentCommand.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
-        }
+        var expected = Result.Fail<bool>("error");
+        _deleteCommentCommand.Setup(c => c.Execute(It.IsAny<Guid>())).ReturnsAsync(expected);
+        
+        // act
+        var result = await _controller.Delete(Guid.NewGuid());
+        var actual = (result as BadRequestObjectResult).Value;
+        
+        // assert
+        _deleteCommentCommand.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
+        result.Should().BeOfType<BadRequestObjectResult>();
+        expected.Error.Should().Be(actual.ToString());
     }
 }
