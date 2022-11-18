@@ -1,6 +1,8 @@
-﻿namespace Application.Posts.Commands.DeletePost;
+﻿using Domain.Common;
+
+namespace Application.Posts.Commands.DeletePost;
 
 public interface IDeletePostCommand
 {
-    Task Execute(Guid id);
+    Task<Result<bool>> Execute(Guid id);
 }

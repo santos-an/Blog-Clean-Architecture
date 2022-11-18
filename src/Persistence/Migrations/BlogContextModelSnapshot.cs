@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Database;
 
@@ -12,11 +11,9 @@ using Persistence.Database;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    [Migration("20221116143457_v4")]
-    partial class v4
+    partial class BlogContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,17 +22,19 @@ namespace Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Model.Comment", b =>
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Author")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
@@ -54,61 +53,62 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b8759465-565d-4e4f-9904-48a44fec4bc1"),
+                            Id = new Guid("37a7f095-b237-4204-89ed-363787a0cfcb"),
                             Author = "Author 1",
                             Content = "Comment 1 about post 1",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(5212),
-                            PostId = new Guid("18461bb0-d8a4-425a-97d7-cc0338462c1c")
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 583, DateTimeKind.Local).AddTicks(149),
+                            PostId = new Guid("3a152e48-b365-4114-9ca3-25afa4c1a76d")
                         },
                         new
                         {
-                            Id = new Guid("8d0cfc25-936b-4217-b3a2-89063f9b788c"),
+                            Id = new Guid("aa85ee15-ba73-4d93-8f09-94ba0d7b0d5a"),
                             Author = "Author 2",
                             Content = "Comment 2 about post 1",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(5483),
-                            PostId = new Guid("18461bb0-d8a4-425a-97d7-cc0338462c1c")
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 583, DateTimeKind.Local).AddTicks(410),
+                            PostId = new Guid("3a152e48-b365-4114-9ca3-25afa4c1a76d")
                         },
                         new
                         {
-                            Id = new Guid("8de1b74f-a5d4-4859-96da-51f0e5919118"),
+                            Id = new Guid("5c747e1f-d2b5-4ae9-951d-40fd3b5b12b0"),
                             Author = "Author 3",
                             Content = "Comment 1 about post 2",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(5492),
-                            PostId = new Guid("2ce103ca-87f2-4b7b-b51d-aadb2d203ed7")
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 583, DateTimeKind.Local).AddTicks(419),
+                            PostId = new Guid("b455c60e-08ba-4d21-8fdd-a1d9fcdbbcde")
                         },
                         new
                         {
-                            Id = new Guid("9791b85b-97a3-43bf-944b-289f4bbd5757"),
+                            Id = new Guid("e4c9f408-db16-4085-9818-4a70e11806d0"),
                             Author = "Author 4",
                             Content = "Comment 2 about post 2",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(5502),
-                            PostId = new Guid("2ce103ca-87f2-4b7b-b51d-aadb2d203ed7")
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 583, DateTimeKind.Local).AddTicks(422),
+                            PostId = new Guid("b455c60e-08ba-4d21-8fdd-a1d9fcdbbcde")
                         },
                         new
                         {
-                            Id = new Guid("114e2d7e-c71c-4a2b-bd5e-9807895a3ea5"),
+                            Id = new Guid("0007c4a2-ce35-4bce-a9b1-2c7fef8bc698"),
                             Author = "Author 5",
                             Content = "Comment 1 about post 3",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(5504),
-                            PostId = new Guid("4775adb5-c2dc-479d-ab20-f1cd24e38769")
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 583, DateTimeKind.Local).AddTicks(425),
+                            PostId = new Guid("2224e45a-138f-4ccc-981f-181104027f46")
                         },
                         new
                         {
-                            Id = new Guid("8785cc95-5c34-4379-919f-ec6366135de8"),
+                            Id = new Guid("2befe4a4-02e8-4a4a-a09a-0e35a6c23440"),
                             Author = "Author 6",
                             Content = "Comment 2 about post 3",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(5509),
-                            PostId = new Guid("4775adb5-c2dc-479d-ab20-f1cd24e38769")
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 583, DateTimeKind.Local).AddTicks(430),
+                            PostId = new Guid("2224e45a-138f-4ccc-981f-181104027f46")
                         });
                 });
 
-            modelBuilder.Entity("Model.Post", b =>
+            modelBuilder.Entity("Domain.Entities.Post", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasMaxLength(1200)
                         .HasColumnType("nvarchar(1200)");
 
@@ -116,6 +116,7 @@ namespace Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
@@ -126,44 +127,44 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("18461bb0-d8a4-425a-97d7-cc0338462c1c"),
+                            Id = new Guid("3a152e48-b365-4114-9ca3-25afa4c1a76d"),
                             Content = "Content 1",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 519, DateTimeKind.Local).AddTicks(4875),
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 580, DateTimeKind.Local).AddTicks(1118),
                             Title = "Post 1"
                         },
                         new
                         {
-                            Id = new Guid("2ce103ca-87f2-4b7b-b51d-aadb2d203ed7"),
+                            Id = new Guid("b455c60e-08ba-4d21-8fdd-a1d9fcdbbcde"),
                             Content = "Content 2",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(3164),
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 582, DateTimeKind.Local).AddTicks(8167),
                             Title = "Post 2"
                         },
                         new
                         {
-                            Id = new Guid("4775adb5-c2dc-479d-ab20-f1cd24e38769"),
+                            Id = new Guid("2224e45a-138f-4ccc-981f-181104027f46"),
                             Content = "Content 3",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(3184),
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 582, DateTimeKind.Local).AddTicks(8186),
                             Title = "Post 3"
                         },
                         new
                         {
-                            Id = new Guid("052fd34a-1073-4f8c-acbc-0186334ae88c"),
+                            Id = new Guid("5a6dfb41-08e3-49da-97b6-a94e63a93bc6"),
                             Content = "Content 4",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(3187),
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 582, DateTimeKind.Local).AddTicks(8198),
                             Title = "Post 4"
                         },
                         new
                         {
-                            Id = new Guid("71e333ec-a5b5-42ac-a147-c9b6c5daa4c2"),
+                            Id = new Guid("04a6be26-0eeb-49e1-92c9-97b15fba1066"),
                             Content = "Content 5",
-                            CreationDate = new DateTime(2022, 11, 16, 14, 34, 57, 522, DateTimeKind.Local).AddTicks(3190),
+                            CreationDate = new DateTime(2022, 11, 18, 13, 33, 36, 582, DateTimeKind.Local).AddTicks(8201),
                             Title = "Post 5"
                         });
                 });
 
-            modelBuilder.Entity("Model.Comment", b =>
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
                 {
-                    b.HasOne("Model.Post", "Post")
+                    b.HasOne("Domain.Entities.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -172,7 +173,7 @@ namespace Persistence.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Model.Post", b =>
+            modelBuilder.Entity("Domain.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
                 });

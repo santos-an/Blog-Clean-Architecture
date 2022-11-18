@@ -1,5 +1,5 @@
-﻿using Application.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Comments.Queries.GetSingleComment;
+using Application.Interfaces;
 
 namespace Application.Comments.Queries.GetAllComments;
 
@@ -9,8 +9,16 @@ public class GetAllCommentsQuery : IGetAllCommentsQuery
 
     public GetAllCommentsQuery(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
     
-    public async Task<IEnumerable<CommentListDto>> Execute()
+    public async Task<IEnumerable<CommentDto>> Execute()
     {
-        return await _unitOfWork.Comments.GetAll();
+        var comments = await _unitOfWork.Comments.GetAll();
+        return comments.Select(c => new CommentDto()
+        {
+            PostId = c.PostId,
+            CommentId = c.Id,
+            Author = c.Author,
+            Content = c.Content,
+            CreationDate = c.CreationDate
+        }).ToList();
     }
 }

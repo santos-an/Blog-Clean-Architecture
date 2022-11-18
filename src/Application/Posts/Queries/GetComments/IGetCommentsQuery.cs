@@ -1,6 +1,8 @@
-﻿namespace Application.Posts.Queries.GetComments;
+﻿using Domain.Common;
+
+namespace Application.Posts.Queries.GetComments;
 
 public interface IGetCommentsQuery
 {
-    Task<PostWithCommentsDto> Execute(Guid id);
+    Task<Result<IEnumerable<CommentDto>>> Execute(Guid id);
 }

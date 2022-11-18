@@ -1,9 +1,7 @@
-using System.Net;
 using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
-using Application.Comments.Queries.GetByPostId;
 using Application.Comments.Queries.GetSingleComment;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,61 +12,71 @@ namespace Api.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly IGetAllCommentsQuery _getAllCommentsQuery;
-    private readonly IGetSingleCommentQuery _getSingleCommentQuery;
+    private readonly IGetCommentQuery _getCommentQuery;
     private readonly ICreateCommentCommand _createCommentCommand;
     private readonly IUpdateCommentCommand _updateCommentCommand;
     private readonly IDeleteCommentCommand _deleteCommentCommand;
-    private readonly IGetCommentByPostIdQuery _commentByPostIdQuery;
 
     public CommentsController(
         IGetAllCommentsQuery getAllCommentsQuery,
-        IGetSingleCommentQuery getSingleCommentQuery,
+        IGetCommentQuery getCommentQuery,
         ICreateCommentCommand createCommentCommand,
         IUpdateCommentCommand updateCommentCommand,
-        IDeleteCommentCommand deleteCommentCommand,
-        IGetCommentByPostIdQuery commentByPostIdQuery)
+        IDeleteCommentCommand deleteCommentCommand)
     {
         _getAllCommentsQuery = getAllCommentsQuery;
-        _getSingleCommentQuery = getSingleCommentQuery;
+        _getCommentQuery = getCommentQuery;
         _createCommentCommand = createCommentCommand;
         _updateCommentCommand = updateCommentCommand;
         _deleteCommentCommand = deleteCommentCommand;
-        _commentByPostIdQuery = commentByPostIdQuery;
     }
     
     [HttpGet]
-    public async Task<IEnumerable<CommentListDto>> GetAll() => await _getAllCommentsQuery.Execute();
-    
+    public async Task<IActionResult> GetAll()
+    {
+        var comments = await _getAllCommentsQuery.Execute();
+        return Ok(comments);
+    }
+
     [HttpGet]
     [Route("{id}")]
-    public async Task<CommentDto> Get(Guid id) => await _getSingleCommentQuery.Execute(id);
-    
-    [HttpGet]
-    [Route("GetByPostId/{id}")]
-    public async Task<IEnumerable<CommentListDto>> GetByPostId(Guid id) => await _commentByPostIdQuery.Execute(id);
-    
-    [HttpPost]
-    public async Task<HttpResponseMessage> Create(CreateCommentDto dto)
+    public async Task<IActionResult> Get(Guid id)
     {
-        await _createCommentCommand.Execute(dto);
-    
-        return new HttpResponseMessage(HttpStatusCode.Created);
+        var result = await _getCommentQuery.Execute(id);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+        
+        return Ok(result.Value);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateCommentDto dto)
+    {
+        var result = await _createCommentCommand.Execute(dto);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+
+        return Ok(result.Value);
     }
     
     [HttpPut]
-    public async Task<HttpResponseMessage> Update(UpdateCommentDto dto)
+    public async Task<IActionResult> Update(UpdateCommentDto dto)
     {
-        await _updateCommentCommand.Execute(dto);
+        var result = await _updateCommentCommand.Execute(dto);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
     
-        return new HttpResponseMessage(HttpStatusCode.OK);
+        return Ok(result.Value);
     }
     
     [HttpDelete]
     [Route("{id}")]
-    public async Task<HttpResponseMessage> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        await _deleteCommentCommand.Execute(id);
+        var result = await _deleteCommentCommand.Execute(id);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
     
-        return new HttpResponseMessage(HttpStatusCode.OK);
+        return Ok($"Deleted");
     }
 }

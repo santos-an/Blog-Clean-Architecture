@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Domain.Entities;
 
 namespace Application.Posts.Commands.CreatePost;
 
@@ -10,7 +11,18 @@ public class CreatePostCommand : ICreatePostCommand
 
     public async Task Execute(CreatePostDto dto)
     {
-        await _unitOfWork.Posts.Create(dto);
+        var post = new Post()
+        {
+            Title = dto.Title,
+            Content = dto.Content,
+            Comments = dto.Comments.Select(c => new Comment()
+            {
+                Content = c.Content,
+                Author = c.Author
+            }).ToList()
+        };
+
+        await _unitOfWork.Posts.Create(post);
         await _unitOfWork.CommitAsync();
     }
 }

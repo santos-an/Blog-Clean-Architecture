@@ -1,4 +1,7 @@
-﻿using Application.Interfaces;
+﻿using Application.Comments.Queries.GetSingleComment;
+using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
 
 namespace Application.Comments.Commands.CreateComment;
 
@@ -8,9 +11,23 @@ public class CreateCommentCommand : ICreateCommentCommand
 
     public CreateCommentCommand(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
-    public async Task Execute(CreateCommentDto dto)
+    public async Task<Result<CommentDto>> Execute(CreateCommentDto dto)
     {
-        await _unitOfWork.Comments.Create(dto);
+        var post = await _unitOfWork.Posts.Get(dto.PostId);
+        if (post.HasNoValue)
+            return Result.Fail<CommentDto>($"There is no post for the give id:{dto.PostId}");
+
+        var comment = new Comment() { Author = dto.Author, Content = dto.Content };
+        _unitOfWork.Comments.Create(post.Value, comment);
         await _unitOfWork.CommitAsync();
+
+        return Result.Ok(new CommentDto()
+        {
+            PostId = comment.PostId,
+            CommentId = comment.Id,
+            Author = comment.Author,
+            Content = comment.Content,
+            CreationDate = comment.CreationDate
+        });
     }
 }

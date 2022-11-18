@@ -1,4 +1,3 @@
-using System.Net;
 using Application.Posts.Commands.CreatePost;
 using Application.Posts.Commands.DeletePost;
 using Application.Posts.Commands.UpdatePost;
@@ -14,7 +13,7 @@ namespace Api.Controllers;
 public class PostsController : ControllerBase
 {
     private readonly IGetAllPostsQuery _allPostsQuery;
-    private readonly IGetSinglePostQuery _singlePostQuery;
+    private readonly IGetPostQuery _postQuery;
     private readonly IGetCommentsQuery _commentsQuery;
     private readonly ICreatePostCommand _createPostCommand;
     private readonly IDeletePostCommand _deletePostCommand;
@@ -22,14 +21,14 @@ public class PostsController : ControllerBase
 
     public PostsController(
         IGetAllPostsQuery allPostsQuery, 
-        IGetSinglePostQuery singlePostQuery, 
+        IGetPostQuery postQuery, 
         IGetCommentsQuery commentsQuery, 
         ICreatePostCommand createPostCommand, 
         IUpdatePostCommand updatePostCommand, 
         IDeletePostCommand deletePostCommand)
     {
         _allPostsQuery = allPostsQuery;
-        _singlePostQuery = singlePostQuery;
+        _postQuery = postQuery;
         _commentsQuery = commentsQuery;
         _createPostCommand = createPostCommand;
         _updatePostCommand = updatePostCommand;
@@ -37,32 +36,59 @@ public class PostsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<PostDto>> GetAll() => await _allPostsQuery.Execute();
+    public async Task<IActionResult> GetAll()
+    {
+        var posts = await _allPostsQuery.Execute();
+        return Ok(posts);
+    }
 
     [HttpGet]
     [Route("{id}")]
-    public async Task<PostDto> Get(Guid id) => await _singlePostQuery.Execute(id);
+    public async Task<IActionResult> Get(Guid id)
+    {
+        var result =  await _postQuery.Execute(id);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+        
+        return Ok(result.Value);
+    }
 
     [HttpGet]
     [Route("{id}/comments")]
-    public async Task<PostWithCommentsDto> GetComments(Guid id) => await _commentsQuery.Execute(id);
+    public async Task<IActionResult> GetComments(Guid id)
+    {
+        var result =  await _commentsQuery.Execute(id);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+
+        return Ok(result.Value);
+    }
 
     [HttpPost]
-    public async Task<HttpResponseMessage> Create(CreatePostDto dto)
+    public async Task<IActionResult> Create(CreatePostDto dto)
     {
         await _createPostCommand.Execute(dto);
-        
-        return new HttpResponseMessage(HttpStatusCode.Created);
+        return Ok("Created");
     }
 
     [HttpPut]
-    public async Task<PostDto> Update(UpdatePostDto dto) => await _updatePostCommand.Execute(dto);
+    public async Task<IActionResult> Update(UpdatePostDto dto)
+    {
+        var result = await _updatePostCommand.Execute(dto);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+
+        return Ok(result.Value);
+    }
 
     [HttpDelete]
     [Route("{id}")]
-    public async Task<HttpResponseMessage> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        await _deletePostCommand.Execute(id);
-        return new HttpResponseMessage(HttpStatusCode.OK);
+        var result = await _deletePostCommand.Execute(id);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+    
+        return Ok("Deleted");
     }
 }

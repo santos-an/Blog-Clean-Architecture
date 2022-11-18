@@ -1,6 +1,9 @@
-﻿namespace Application.Comments.Commands.CreateComment;
+﻿using Application.Comments.Queries.GetSingleComment;
+using Domain.Common;
+
+namespace Application.Comments.Commands.CreateComment;
 
 public interface ICreateCommentCommand
 {
-    Task Execute(CreateCommentDto dto);
+    Task<Result<CommentDto>> Execute(CreateCommentDto dto);
 }

@@ -1,6 +1,8 @@
-﻿namespace Application.Comments.Queries.GetAllComments;
+﻿using Application.Comments.Queries.GetSingleComment;
+
+namespace Application.Comments.Queries.GetAllComments;
 
 public interface IGetAllCommentsQuery
 {
-    Task<IEnumerable<CommentListDto>> Execute();
+    Task<IEnumerable<CommentDto>> Execute();
 }

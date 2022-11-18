@@ -1,16 +1,15 @@
-﻿using Application.Posts.Commands.CreatePost;
-using Application.Posts.Commands.UpdatePost;
-using Application.Posts.Queries.GetAllPosts;
-using Application.Posts.Queries.GetComments;
+﻿using Application.Posts.Commands.UpdatePost;
+using Domain.Common;
+using Domain.Entities;
 
 namespace Application.Interfaces;
 
 public interface IPostRepository
 {
-    public Task<IEnumerable<PostDto>> GetAll();
-    public Task<PostDto> Get(Guid id);
-    public Task<PostWithCommentsDto> GetComments(Guid id);
-    public Task Create(CreatePostDto post);
-    public Task<PostDto> Update(UpdatePostDto post);
-    public Task<bool> Delete(Guid id);
+    public Task<IEnumerable<Post>> GetAll();
+    public Task<Maybe<Post>> Get(Guid id);
+    public Task<Maybe<IEnumerable<Comment>>> GetComments(Guid id);
+    public Task Create(Post post);
+    public Post Update(Post post, UpdatePostDto dto);
+    public Task<bool> Delete(Post post);
 }

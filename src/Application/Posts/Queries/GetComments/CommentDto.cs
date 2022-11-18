@@ -1,15 +1,6 @@
-﻿
-using Application.Posts.Queries.GetAllPosts;
+﻿namespace Application.Posts.Queries.GetComments;
 
-namespace Application.Posts.Queries.GetComments;
-
-public record PostWithCommentsDto
-{
-    public Guid PostId { get; set; }
-    public List<CommentListDto> Comments { get; set; }
-}
-
-public record CommentListDto
+public record CommentDto
 {
     public Guid Id { get; set; }
     public string Content { get; set; }

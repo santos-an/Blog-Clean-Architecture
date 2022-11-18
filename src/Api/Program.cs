@@ -4,7 +4,6 @@ using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
-using Application.Comments.Queries.GetByPostId;
 using Application.Comments.Queries.GetSingleComment;
 using Application.Interfaces;
 using Application.Posts.Commands.CreatePost;
@@ -52,14 +51,13 @@ public static class Program
         services.AddScoped<IPostRepository, PostRepository>();
         
         services.AddTransient<IGetAllCommentsQuery, GetAllCommentsQuery>();
-        services.AddTransient<IGetSingleCommentQuery, GetSingleSingleCommentQuery>();
+        services.AddTransient<IGetCommentQuery, GetCommentQuery>();
         services.AddTransient<ICreateCommentCommand, CreateCommentCommand>();
         services.AddTransient<IUpdateCommentCommand, UpdateCommentCommand>();
         services.AddTransient<IDeleteCommentCommand, DeleteCommentCommand>();
-        services.AddTransient<IGetCommentByPostIdQuery, GetCommentByPostIdQuery>();
         
         services.AddTransient<IGetAllPostsQuery, GetAllPostsQuery>();
-        services.AddTransient<IGetSinglePostQuery, GetSinglePostQuery>();
+        services.AddTransient<IGetPostQuery, GetPostQuery>();
         services.AddTransient<IGetCommentsQuery, GetCommentsQuery>();
         services.AddTransient<ICreatePostCommand, CreatePostCommand>();
         services.AddTransient<IUpdatePostCommand, UpdatePostCommand>();
