@@ -1,6 +1,6 @@
 ﻿using Domain.Common;
 
-namespace Application.Comments.Queries.GetSingleComment;
+namespace Application.Comments.Queries.GetComment;
 
 public interface IGetCommentQuery
 {

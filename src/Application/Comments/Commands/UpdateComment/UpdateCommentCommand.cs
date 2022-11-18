@@ -1,4 +1,4 @@
-﻿using Application.Comments.Queries.GetSingleComment;
+﻿using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
 using Domain.Common;
 
@@ -24,7 +24,7 @@ public class UpdateCommentCommand : IUpdateCommentCommand
             PostId = comment.PostId,
             Author = comment.Author,
             Content = comment.Content,
-            CommentId = comment.Id,
+            Id = comment.Id,
             CreationDate = comment.CreationDate
         });
     }

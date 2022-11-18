@@ -1,9 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Common;
-using Domain.Exceptions;
-using Microsoft.EntityFrameworkCore;
 
-namespace Application.Comments.Queries.GetSingleComment;
+namespace Application.Comments.Queries.GetComment;
 
 public class GetCommentQuery : IGetCommentQuery
 {
@@ -21,7 +19,7 @@ public class GetCommentQuery : IGetCommentQuery
         var dto = new CommentDto()
         {
             PostId = comment.PostId,
-            CommentId = comment.Id,
+            Id = comment.Id,
             Author = comment.Author,
             Content = comment.Content,
             CreationDate = comment.CreationDate

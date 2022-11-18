@@ -1,5 +1,4 @@
-﻿using Application.Comments.Queries.GetSingleComment;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Posts.Queries.GetComments;
 using Domain.Common;
 using Domain.Entities;

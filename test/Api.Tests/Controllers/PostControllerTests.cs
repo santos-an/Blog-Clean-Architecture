@@ -10,7 +10,7 @@ using Application.Posts.Commands.DeletePost;
 using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
 using Application.Posts.Queries.GetComments;
-using Application.Posts.Queries.GetSinglePost;
+using Application.Posts.Queries.GetPost;
 using Domain.Common;
 using Domain.Exceptions;
 using FluentAssertions;

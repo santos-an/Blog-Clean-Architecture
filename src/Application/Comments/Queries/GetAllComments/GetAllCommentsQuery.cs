@@ -1,4 +1,4 @@
-﻿using Application.Comments.Queries.GetSingleComment;
+﻿using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
 
 namespace Application.Comments.Queries.GetAllComments;
@@ -15,7 +15,7 @@ public class GetAllCommentsQuery : IGetAllCommentsQuery
         return comments.Select(c => new CommentDto()
         {
             PostId = c.PostId,
-            CommentId = c.Id,
+            Id = c.Id,
             Author = c.Author,
             Content = c.Content,
             CreationDate = c.CreationDate

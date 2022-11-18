@@ -1,5 +1,4 @@
 ﻿using Application.Comments.Commands.UpdateComment;
-using Application.Comments.Queries.GetSingleComment;
 using Application.Interfaces;
 using Domain.Common;
 using Domain.Entities;

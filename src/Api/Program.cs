@@ -4,14 +4,14 @@ using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
-using Application.Comments.Queries.GetSingleComment;
+using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
 using Application.Posts.Commands.CreatePost;
 using Application.Posts.Commands.DeletePost;
 using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
 using Application.Posts.Queries.GetComments;
-using Application.Posts.Queries.GetSinglePost;
+using Application.Posts.Queries.GetPost;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
 
@@ -79,7 +79,7 @@ public static class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
+        
         app.UseMiddleware<ExceptionMiddleware>();
         app.UseHttpsRedirection();
         app.UseAuthorization();

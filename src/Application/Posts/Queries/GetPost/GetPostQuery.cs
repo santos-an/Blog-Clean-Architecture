@@ -3,7 +3,7 @@ using Application.Posts.Queries.GetAllPosts;
 using Application.Posts.Queries.GetComments;
 using Domain.Common;
 
-namespace Application.Posts.Queries.GetSinglePost;
+namespace Application.Posts.Queries.GetPost;
 
 public class GetPostQuery : IGetPostQuery
 {

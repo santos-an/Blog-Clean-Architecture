@@ -1,7 +1,7 @@
 ﻿using Application.Posts.Queries.GetAllPosts;
 using Domain.Common;
 
-namespace Application.Posts.Queries.GetSinglePost;
+namespace Application.Posts.Queries.GetPost;
 
 public interface IGetPostQuery
 {

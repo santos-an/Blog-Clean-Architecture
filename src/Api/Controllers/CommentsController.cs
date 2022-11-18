@@ -2,7 +2,7 @@ using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
-using Application.Comments.Queries.GetSingleComment;
+using Application.Comments.Queries.GetComment;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;

@@ -6,7 +6,7 @@ using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
-using Application.Comments.Queries.GetSingleComment;
+using Application.Comments.Queries.GetComment;
 using Domain.Common;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +49,7 @@ public class CommentControllerTests
         {
             new()
             {
-                Author = "author 1", Content = "conten 1", PostId = Guid.NewGuid(), CommentId = Guid.NewGuid(),
+                Author = "author 1", Content = "conten 1", PostId = Guid.NewGuid(), Id = Guid.NewGuid(),
                 CreationDate = DateTime.Today
             }
         };
@@ -72,7 +72,7 @@ public class CommentControllerTests
         // Arrange
         var expected = Result.Ok(new CommentDto()
         {
-            CommentId = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Author = "author 1",
             Content = "content 1",
             PostId = Guid.NewGuid(),
@@ -113,7 +113,7 @@ public class CommentControllerTests
     {
         // arrange
         var input = new CreateCommentDto { PostId = Guid.NewGuid(), Author = "author 1", Content = "content 1", };
-        var expected = Result.Ok(new CommentDto { CommentId = Guid.NewGuid(), PostId = input.PostId, Author = input.Author, Content = input.Content });
+        var expected = Result.Ok(new CommentDto { Id = Guid.NewGuid(), PostId = input.PostId, Author = input.Author, Content = input.Content });
         _createCommentCommand.Setup(c => c.Execute(It.IsAny<CreateCommentDto>())).ReturnsAsync(expected);
 
         // act
@@ -142,7 +142,7 @@ public class CommentControllerTests
         };
         var expected = Result.Ok(new CommentDto()
         {
-            CommentId = input.Id,
+            Id = input.Id,
             Author = input.NewAuthor,
             Content = input.NewContent
         });

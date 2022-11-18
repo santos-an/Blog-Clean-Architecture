@@ -1,4 +1,4 @@
-﻿using Application.Comments.Queries.GetSingleComment;
+﻿using Application.Comments.Queries.GetComment;
 
 namespace Application.Comments.Queries.GetAllComments;
 

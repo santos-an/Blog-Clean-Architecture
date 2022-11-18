@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Posts.Queries.GetSinglePost;
+using Application.Posts.Queries.GetPost;
 using Domain.Common;
 using Domain.Entities;
 using FluentAssertions;
