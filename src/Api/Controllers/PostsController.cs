@@ -67,8 +67,11 @@ public class PostsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreatePostDto dto)
     {
-        await _createPostCommand.Execute(dto);
-        return Ok("Created");
+        var result = await _createPostCommand.Execute(dto);
+        if (result.IsFailure)
+            return BadRequest(result.Error);
+        
+        return Ok(result.Value);
     }
 
     [HttpPut]
