@@ -1,5 +1,7 @@
 ﻿using Application.Comments.Commands.CreateComment;
+using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
+using AutoMapper;
 using Domain.Common;
 using Domain.Entities;
 using FluentAssertions;
@@ -10,13 +12,15 @@ namespace Application.Tests.Comments.Commands;
 
 public class CreateCommentCommandTests
 {
+    private readonly Mock<IMapper> _mapper;
     private readonly Mock<IUnitOfWork> _unitOfWork;
     private readonly CreateCommentCommand _command;
 
     public CreateCommentCommandTests()
     {
+        _mapper = new Mock<IMapper>();
         _unitOfWork = new Mock<IUnitOfWork>();
-        _command = new CreateCommentCommand(_unitOfWork.Object);
+        _command = new CreateCommentCommand(_mapper.Object, _unitOfWork.Object);
     }
 
     [Fact]
@@ -26,6 +30,7 @@ public class CreateCommentCommandTests
         _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>(new Post()));
         _unitOfWork.Setup(u => u.Comments.Create(It.IsAny<Post>(), It.IsAny<Comment>())); 
         _unitOfWork.Setup(u => u.CommitAsync());
+        _mapper.Setup(m => m.Map<CommentDto>(It.IsAny<Comment>())).Returns(new CommentDto());
 
         // act
         var actual = await _command.Execute(new CreateCommentDto());
@@ -50,6 +55,7 @@ public class CreateCommentCommandTests
         _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
         _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Post>(),It.IsAny<Comment>()), Times.Never);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
+        _mapper.Verify(m => m.Map<CommentDto>(It.IsAny<Comment>()), Times.Never);
         actual.IsFailure.Should().Be(true);
     }
 }

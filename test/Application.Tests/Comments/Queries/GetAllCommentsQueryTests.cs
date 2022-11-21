@@ -1,5 +1,7 @@
 ﻿using Application.Comments.Queries.GetAllComments;
+using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
+using AutoMapper;
 using Domain.Entities;
 using FluentAssertions;
 using Moq;
@@ -9,19 +11,22 @@ namespace Application.Tests.Comments.Queries;
 
 public class GetAllCommentsQueryTests
 {
+    private readonly Mock<IMapper> _mapper;
     private readonly Mock<IUnitOfWork> _unitOfWork;
     private readonly GetAllCommentsQuery _commentsQuery;
 
     public GetAllCommentsQueryTests()
     {
+        _mapper = new Mock<IMapper>();
         _unitOfWork = new Mock<IUnitOfWork>();
-        _commentsQuery = new GetAllCommentsQuery(_unitOfWork.Object);
+        _commentsQuery = new GetAllCommentsQuery(_mapper.Object, _unitOfWork.Object);
     }
 
     [Fact]
     public async Task Execute_GetsCalled_ReturnsAllExistingComments()
     {
         // arrange
+        _mapper.Setup(m => m.Map<CommentDto>(It.IsAny<Comment>())).Returns(new CommentDto());
         _unitOfWork.Setup(u => u.Comments.GetAll()).ReturnsAsync(Comments());
 
         // act

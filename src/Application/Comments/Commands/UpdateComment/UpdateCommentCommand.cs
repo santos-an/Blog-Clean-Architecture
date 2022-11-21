@@ -1,14 +1,20 @@
 ﻿using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
+using AutoMapper;
 using Domain.Common;
 
 namespace Application.Comments.Commands.UpdateComment;
 
 public class UpdateCommentCommand : IUpdateCommentCommand
 {
+    private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateCommentCommand(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+    public UpdateCommentCommand(IMapper mapper, IUnitOfWork unitOfWork)
+    {
+        _mapper = mapper;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task<Result<CommentDto>> Execute(UpdateCommentDto dto)
     {
@@ -19,13 +25,7 @@ public class UpdateCommentCommand : IUpdateCommentCommand
         var comment = _unitOfWork.Comments.Update(maybe.Value, dto);
         await _unitOfWork.CommitAsync();
 
-        return Result.Ok(new CommentDto()
-        {
-            PostId = comment.PostId,
-            Author = comment.Author,
-            Content = comment.Content,
-            Id = comment.Id,
-            CreationDate = comment.CreationDate
-        });
+        var result = _mapper.Map<CommentDto>(comment);
+        return Result.Ok(result);
     }
 }

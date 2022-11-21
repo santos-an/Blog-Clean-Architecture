@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Api.Mapper;
 using Api.Utils;
 using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
@@ -12,6 +13,7 @@ using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
 using Application.Posts.Queries.GetComments;
 using Application.Posts.Queries.GetPost;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
 
@@ -42,6 +44,7 @@ public static class Program
             .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
+        services.AddAutoMapper(typeof(MappingProfile));
     }
 
     private static void ConfigureDi(IServiceCollection services)
