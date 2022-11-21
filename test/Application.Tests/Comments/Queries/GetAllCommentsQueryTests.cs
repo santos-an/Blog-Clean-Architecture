@@ -34,6 +34,7 @@ public class GetAllCommentsQueryTests
 
         // assert
         _unitOfWork.Verify(u => u.Comments.GetAll(), Times.Once);
+        _mapper.Verify(m => m.Map<CommentDto>(It.IsAny<Comment>()), Times.Once);
         
         actual.Should().NotBeNull();
         actual.Should().NotBeEmpty();

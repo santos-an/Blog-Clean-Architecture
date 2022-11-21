@@ -1,3 +1,4 @@
+using Api.Utils;
 using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
@@ -30,7 +31,7 @@ public class CommentsController : ControllerBase
         _updateCommentCommand = updateCommentCommand;
         _deleteCommentCommand = deleteCommentCommand;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -44,8 +45,8 @@ public class CommentsController : ControllerBase
     {
         var result = await _getCommentQuery.Execute(id);
         if (result.IsFailure)
-            return BadRequest(result.Error);
-        
+            return Failure(result.Error);
+
         return Ok(result.Value);
     }
 
@@ -54,29 +55,39 @@ public class CommentsController : ControllerBase
     {
         var result = await _createCommentCommand.Execute(dto);
         if (result.IsFailure)
-            return BadRequest(result.Error);
+            return Failure(result.Error);
 
         return Ok(result.Value);
     }
-    
+
     [HttpPut]
     public async Task<IActionResult> Update(UpdateCommentDto dto)
     {
         var result = await _updateCommentCommand.Execute(dto);
         if (result.IsFailure)
-            return BadRequest(result.Error);
-    
+            return Failure(result.Error);
+
         return Ok(result.Value);
     }
-    
+
     [HttpDelete]
     [Route("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _deleteCommentCommand.Execute(id);
         if (result.IsFailure)
-            return BadRequest(result.Error);
-    
-        return Ok($"Deleted");
+            return Failure(result.Error);
+
+        return Ok("Deleted");
+    }
+
+    private BadRequestObjectResult Failure(string error)
+    {
+        return new BadRequestObjectResult(
+            new ErrorDetails
+            {
+                StatusCode = BadRequest().StatusCode,
+                Message = error
+            });
     }
 }

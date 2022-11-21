@@ -1,6 +1,6 @@
-﻿using Application.Posts.Queries.GetComments;
+﻿using Application.Comments.Queries.GetComment;
 
-namespace Application.Posts.Queries.GetAllPosts;
+namespace Application.Posts.Queries.GetPost;
 
 public record PostDto
 {

@@ -1,13 +1,20 @@
-﻿using Application.Interfaces;
+﻿using Application.Comments.Queries.GetComment;
+using Application.Interfaces;
+using AutoMapper;
 using Domain.Common;
 
 namespace Application.Posts.Queries.GetComments;
 
 public class GetCommentsQuery : IGetCommentsQuery
 {
+    private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public GetCommentsQuery(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+    public GetCommentsQuery(IMapper mapper, IUnitOfWork unitOfWork)
+    {
+        _mapper = mapper;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task<Result<IEnumerable<CommentDto>>> Execute(Guid id)
     {
@@ -16,12 +23,11 @@ public class GetCommentsQuery : IGetCommentsQuery
             return Result.Fail<IEnumerable<CommentDto>>($"There is no post for the given id:{id}");
 
         var comments = maybe.Value;
-        return Result.Ok<IEnumerable<CommentDto>>(comments.Select(c => new CommentDto()
-        {
-            Id = c.Id,
-            Author = c.Author,
-            Content = c.Content,
-            CreationDate = c.CreationDate
-        }).ToList());
+        var commentsDto = comments
+            .Select(
+                comment => _mapper.Map<CommentDto>(comment))
+            .ToList();
+        
+        return Result.Ok<IEnumerable<CommentDto>>(commentsDto);
     }
 }

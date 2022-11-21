@@ -39,6 +39,8 @@ public class CreateCommentCommandTests
         _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
         _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Post>(),It.IsAny<Comment>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
+        _mapper.Verify(m => m.Map<CommentDto>(It.IsAny<Comment>()), Times.Once);
+        
         actual.IsSuccess.Should().Be(true);
     }
 

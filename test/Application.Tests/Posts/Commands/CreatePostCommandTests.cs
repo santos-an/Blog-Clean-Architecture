@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Posts.Commands.CreatePost;
 using Application.Posts.Queries.GetAllPosts;
+using Application.Posts.Queries.GetPost;
 using AutoMapper;
 using Domain.Entities;
 using Moq;

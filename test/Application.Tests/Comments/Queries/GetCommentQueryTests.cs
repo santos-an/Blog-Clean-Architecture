@@ -29,10 +29,10 @@ public class GetCommentQueryTests
         // arrange
         _mapper.Setup(m => m.Map<CommentDto>(It.IsAny<Comment>())).Returns(new CommentDto());
         _unitOfWork.Setup(u => u.Comments.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Comment>(new Comment()));
-    
+        
         // act
         var actual = await _singleCommentQuery.Execute(Guid.NewGuid());
-    
+        
         // assert
         _unitOfWork.Verify(u => u.Comments.Get(It.IsAny<Guid>()), Times.Once);
         actual.IsSuccess.Should().Be(true);
@@ -44,12 +44,14 @@ public class GetCommentQueryTests
     {
         // arrange
         _unitOfWork.Setup(u => u.Comments.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Comment>());
-    
+        
         // act
         var actual = await _singleCommentQuery.Execute(Guid.NewGuid());
         
         // assert
         _unitOfWork.Verify(u => u.Comments.Get(It.IsAny<Guid>()), Times.Once);
+        _mapper.Verify(m => m.Map<CommentDto>(It.IsAny<Comment>()), Times.Never);
+        
         actual.IsFailure.Should().Be(true);
         actual.Should().NotBeNull();
     }
