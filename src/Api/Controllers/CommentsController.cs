@@ -83,11 +83,10 @@ public class CommentsController : ControllerBase
 
     private BadRequestObjectResult Failure(string error)
     {
-        return new BadRequestObjectResult(
-            new ErrorDetails
-            {
-                StatusCode = BadRequest().StatusCode,
-                Message = error
-            });
+        return BadRequest(new ErrorDetails
+        {
+            StatusCode = BadRequest().StatusCode,
+            Message = error
+        });
     }
 }
