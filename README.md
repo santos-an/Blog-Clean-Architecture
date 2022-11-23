@@ -4,6 +4,10 @@
 ## Introduction
 This is a sample application, to demonstrate a Rest Api implementation, using **Clean Architecture** and Microsoft .NET 6. 
 
+We are also using some functional programing concepts such as: 
+- ``Maybe<T>`` - to avoid Nulls with the Maybe Type
+- ``Result`` - to handle failures and Input Errors in a Functional Way
+
 
 ### Context
 > You were hired as a consultant for BestBlogs<sup>TM</sup> company. The company needs your help to implement a REST api for its newest blog product.
