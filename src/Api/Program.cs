@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Api.Mapper;
 using Api.Utils;
 using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
@@ -7,13 +6,15 @@ using Application.Comments.Commands.UpdateComment;
 using Application.Comments.Queries.GetAllComments;
 using Application.Comments.Queries.GetComment;
 using Application.Interfaces;
+using Application.Mappers;
 using Application.Posts.Commands.CreatePost;
 using Application.Posts.Commands.DeletePost;
 using Application.Posts.Commands.UpdatePost;
 using Application.Posts.Queries.GetAllPosts;
 using Application.Posts.Queries.GetComments;
 using Application.Posts.Queries.GetPost;
-using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
 
@@ -28,23 +29,34 @@ public static class Program
         var services = builder.Services;
         ConfigureServices(services);
         ConfigureDi(services);
-
+        
         var app = builder.Build();
         RunMigrations(app);
         ConfigureApp(app);
-
+        
         app.Run();
     }
 
     private static void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<BlogContext>();
-        
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options => options.CustomSchemaIds(type => type.ToString()));
         services.AddAutoMapper(typeof(MappingProfile));
+
+        AddFluentValidation(services);
+    }
+    
+    private static void AddFluentValidation(IServiceCollection services)
+    {
+        services.AddFluentValidationAutoValidation();
+
+        services.AddValidatorsFromAssemblyContaining<CreateCommentDtoValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdateCommentDtoValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreatePostDtoValidator>();
+        services.AddValidatorsFromAssemblyContaining<UpdatePostDtoValidator>();
     }
 
     private static void ConfigureDi(IServiceCollection services)
