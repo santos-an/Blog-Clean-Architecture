@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Posts.Queries.GetPost;
+using AutoMapper;
 using Domain.Common;
 using Domain.Entities;
 using FluentAssertions;
@@ -10,13 +11,15 @@ namespace Application.Tests.Posts.Queries;
 
 public class GetPostQueryTests
 {
+    private readonly Mock<IMapper> _mapper;
     private readonly Mock<IUnitOfWork> _unitOfWork;
     private readonly IGetPostQuery _query;
 
     public GetPostQueryTests()
     {
+        _mapper = new Mock<IMapper>();
         _unitOfWork = new Mock<IUnitOfWork>();
-        _query = new GetPostQuery(_unitOfWork.Object);
+        _query = new GetPostQuery(_mapper.Object, _unitOfWork.Object);
     }
 
     [Fact]

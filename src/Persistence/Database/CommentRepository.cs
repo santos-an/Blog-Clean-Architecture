@@ -20,7 +20,11 @@ public class CommentRepository : ICommentRepository
         return new Maybe<Comment>(comment);
     }
 
-    public void Create(Post post, Comment comment) => post.Comments.Add(comment);
+    public void Create(Post post, Comment comment)
+    {
+        comment.CreationDate = DateTime.Now;
+        post.Comments.Add(comment);
+    }
 
     public Comment Update(Comment comment, UpdateCommentDto dto)
     {

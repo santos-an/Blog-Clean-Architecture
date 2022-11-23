@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Controllers;
+using Api.Utils;
 using Application.Comments.Commands.CreateComment;
 using Application.Comments.Commands.DeleteComment;
 using Application.Comments.Commands.UpdateComment;
@@ -171,12 +172,12 @@ public class CommentControllerTests
         
         // act
         var result = await _controller.Update(input);
-        var actual = (result as BadRequestObjectResult).Value;
+        var actual = (result as BadRequestObjectResult).Value as ErrorDetails;
         
         // assert
         _updateCommentCommand.Verify(c => c.Execute(It.IsAny<UpdateCommentDto>()), Times.Once);
         result.Should().BeOfType<BadRequestObjectResult>();
-        expected.Error.Should().Be(actual.ToString());
+        expected.Error.Should().Be(actual.Message);
     }
     
     [Fact]
@@ -206,11 +207,11 @@ public class CommentControllerTests
         
         // act
         var result = await _controller.Delete(Guid.NewGuid());
-        var actual = (result as BadRequestObjectResult).Value;
+        var actual = (result as BadRequestObjectResult).Value as ErrorDetails;
         
         // assert
         _deleteCommentCommand.Verify(c => c.Execute(It.IsAny<Guid>()), Times.Once);
         result.Should().BeOfType<BadRequestObjectResult>();
-        expected.Error.Should().Be(actual.ToString());
+        expected.Error.Should().Be(actual.Message);
     }
 }

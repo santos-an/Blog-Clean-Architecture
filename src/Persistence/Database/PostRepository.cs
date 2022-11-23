@@ -40,7 +40,13 @@ public class PostRepository : IPostRepository
         return new Maybe<IEnumerable<Comment>>(post.Comments);
     }
 
-    public async Task Create(Post post) => await _context.Posts.AddAsync(post);
+    public async Task Create(Post post)
+    {
+        post.CreationDate = DateTime.Now;
+        post.Comments.ForEach(c => c.CreationDate = DateTime.Now);
+        
+        await _context.Posts.AddAsync(post);
+    }
 
     public Post Update(Post post, UpdatePostDto dto)
     {

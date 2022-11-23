@@ -1,30 +1,25 @@
 ﻿using Application.Interfaces;
-using Application.Posts.Queries.GetComments;
+using Application.Posts.Queries.GetPost;
+using AutoMapper;
 
 namespace Application.Posts.Queries.GetAllPosts;
 
 public class GetAllPostsQuery : IGetAllPostsQuery
 {
+    private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public GetAllPostsQuery(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+    public GetAllPostsQuery(IMapper mapper, IUnitOfWork unitOfWork)
+    {
+        _mapper = mapper;
+        _unitOfWork = unitOfWork;
+    }
 
     public async Task<IEnumerable<PostDto>> Execute()
     {
         var posts = await _unitOfWork.Posts.GetAll();
-        return posts.Select(p => new PostDto()
-        {
-            Id = p.Id,
-            Title = p.Title,
-            Content = p.Content,
-            CreationDate = p.CreationDate,
-            Comments = p.Comments.Select(c => new CommentDto()
-            {
-                Id = c.Id,
-                Author = c.Author,
-                Content = c.Content,
-                CreationDate = c.CreationDate
-            }).ToList()
-        }).ToList();
+        return posts.Select(post => 
+                _mapper.Map<PostDto>(post))
+            .ToList();
     }
 }

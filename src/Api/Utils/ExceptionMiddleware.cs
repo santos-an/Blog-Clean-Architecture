@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Text.Json;
 
 namespace Api.Utils;
 
@@ -39,16 +38,5 @@ public class ExceptionMiddleware
             StatusCode = context.Response.StatusCode,
             Message = $"Internal Server Error from the custom middleware: {exception.Message}"
         }.ToString());
-    }
-
-    private sealed class ErrorDetails
-    {
-        public int StatusCode { get; set; }
-        public string? Message { get; set; }
-
-        public override string ToString()
-        {
-            return JsonSerializer.Serialize(this);
-        }
     }
 }

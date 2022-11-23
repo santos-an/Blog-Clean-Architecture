@@ -1,6 +1,6 @@
 ﻿namespace Application.Comments.Queries.GetComment;
 
-public class CommentDto
+public record CommentDto
 {
     public Guid Id { get; set; }
     public Guid PostId { get; set; }

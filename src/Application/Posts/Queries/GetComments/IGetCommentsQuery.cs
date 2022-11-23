@@ -1,4 +1,5 @@
-﻿using Domain.Common;
+﻿using Application.Comments.Queries.GetComment;
+using Domain.Common;
 
 namespace Application.Posts.Queries.GetComments;
 
