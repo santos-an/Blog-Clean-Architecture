@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
+using Persistence.Database;
 
-namespace Persistence.Database;
+namespace Persistence.Repository;
 
 public class UnitOfWork : IUnitOfWork
 {

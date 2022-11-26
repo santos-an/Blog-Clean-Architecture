@@ -3,8 +3,9 @@ using Application.Posts.Commands.UpdatePost;
 using Domain.Common;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Database;
 
-namespace Persistence.Database;
+namespace Persistence.Repository;
 
 public class PostRepository : IPostRepository
 {
@@ -55,6 +56,8 @@ public class PostRepository : IPostRepository
         if (!string.IsNullOrEmpty(dto.Title))
             post.Title = dto.Title;
 
+        _context.Posts.Update(post);
+        
         return post;
     }
 

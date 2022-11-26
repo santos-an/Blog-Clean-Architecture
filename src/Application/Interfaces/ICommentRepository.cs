@@ -8,7 +8,7 @@ public interface ICommentRepository
 {
     public Task<IEnumerable<Comment>> GetAll();
     public Task<Maybe<Comment>> Get(Guid id);
-    public void Create(Post post, Comment comment);
+    public Task Create(Comment comment);
     public Comment Update(Comment comment, UpdateCommentDto dto);
     public Task<bool> Delete(Comment comment);
 }

@@ -3,8 +3,9 @@ using Application.Interfaces;
 using Domain.Common;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Database;
 
-namespace Persistence.Database;
+namespace Persistence.Repository;
 
 public class CommentRepository : ICommentRepository
 {
@@ -20,10 +21,11 @@ public class CommentRepository : ICommentRepository
         return new Maybe<Comment>(comment);
     }
 
-    public void Create(Post post, Comment comment)
+    public async Task Create(Comment comment)
     {
         comment.CreationDate = DateTime.Now;
-        post.Comments.Add(comment);
+
+        await _context.Comments.AddAsync(comment);
     }
 
     public Comment Update(Comment comment, UpdateCommentDto dto)
@@ -33,6 +35,8 @@ public class CommentRepository : ICommentRepository
         
         if (!string.IsNullOrEmpty(dto.NewContent))
             comment.Content = dto.NewContent;
+
+        _context.Comments.Update(comment);
         
         return comment;
     }

@@ -19,15 +19,17 @@ public class CreateCommentCommand : ICreateCommentCommand
 
     public async Task<Result<CommentDto>> Execute(CreateCommentDto dto)
     {
-        var post = await _unitOfWork.Posts.Get(dto.PostId);
-        if (post.HasNoValue)
+        var maybe = await _unitOfWork.Posts.Get(dto.PostId);
+        if (maybe.HasNoValue)
             return Result.Fail<CommentDto>($"There is no post for the give id:{dto.PostId}");
 
-        var comment = new Comment() { Author = dto.Author, Content = dto.Content };
-        _unitOfWork.Comments.Create(post.Value, comment);
+        var post = maybe.Value;
+        var comment = new Comment() { Author = dto.Author, Content = dto.Content, Post = post };
+        
+        await _unitOfWork.Comments.Create(comment);
         await _unitOfWork.CommitAsync();
         
-        var result = _mapper.Map<CommentDto>(comment);
-        return Result.Ok(result);
+        var commentDto = _mapper.Map<CommentDto>(comment);
+        return Result.Ok(commentDto);
     }
 }

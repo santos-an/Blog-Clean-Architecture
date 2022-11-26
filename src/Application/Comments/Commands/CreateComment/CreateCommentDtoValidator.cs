@@ -2,10 +2,12 @@
 
 namespace Application.Comments.Commands.CreateComment;
 
-public class CreateCommentDtoValidator : AbstractValidator<Posts.Commands.CreatePost.CreateCommentDto>
+public class CreateCommentDtoValidator : AbstractValidator<CreateCommentDto>
 {
     public CreateCommentDtoValidator()
     {
+        RuleFor(c => c.PostId).NotEmpty().NotNull();
+        
         RuleFor(c => c.Author).NotEmpty().NotNull();
         RuleFor(p => p.Author).MaximumLength(30);
         

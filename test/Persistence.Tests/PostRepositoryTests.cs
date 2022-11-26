@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
 using Persistence.Database;
+using Persistence.Repository;
 using Xunit;
 
 namespace Persistence.Tests;

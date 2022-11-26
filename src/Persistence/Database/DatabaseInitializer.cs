@@ -2,7 +2,7 @@
 
 namespace Persistence.Database;
 
-public class DatabaseInitializer
+public static class DatabaseInitializer
 {
     public static readonly IEnumerable<Post> Posts = new List<Post>()
     {

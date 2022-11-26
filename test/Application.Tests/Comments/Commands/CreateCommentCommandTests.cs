@@ -28,7 +28,7 @@ public class CreateCommentCommandTests
     {
         // arrange
         _unitOfWork.Setup(u => u.Posts.Get(It.IsAny<Guid>())).ReturnsAsync(new Maybe<Post>(new Post()));
-        _unitOfWork.Setup(u => u.Comments.Create(It.IsAny<Post>(), It.IsAny<Comment>())); 
+        _unitOfWork.Setup(u => u.Comments.Create(It.IsAny<Comment>())); 
         _unitOfWork.Setup(u => u.CommitAsync());
         _mapper.Setup(m => m.Map<CommentDto>(It.IsAny<Comment>())).Returns(new CommentDto());
 
@@ -37,7 +37,7 @@ public class CreateCommentCommandTests
 
         // assert
         _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
-        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Post>(),It.IsAny<Comment>()), Times.Once);
+        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Comment>()), Times.Once);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Once);
         _mapper.Verify(m => m.Map<CommentDto>(It.IsAny<Comment>()), Times.Once);
         
@@ -55,7 +55,7 @@ public class CreateCommentCommandTests
         
         // assert
         _unitOfWork.Verify(u => u.Posts.Get(It.IsAny<Guid>()), Times.Once);
-        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Post>(),It.IsAny<Comment>()), Times.Never);
+        _unitOfWork.Verify(u => u.Comments.Create(It.IsAny<Comment>()), Times.Never);
         _unitOfWork.Verify(u => u.CommitAsync(), Times.Never);
         _mapper.Verify(m => m.Map<CommentDto>(It.IsAny<Comment>()), Times.Never);
         actual.IsFailure.Should().Be(true);
